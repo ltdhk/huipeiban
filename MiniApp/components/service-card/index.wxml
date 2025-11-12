@@ -1,0 +1,17 @@
+<view class="service-card" bindtap="onTap">
+  <image class="service-image" src="{{image}}" mode="aspectFill"></image>
+  <view class="service-info">
+    <text class="service-name">{{name}}</text>
+    <view class="service-tags">
+      <text class="tag" wx:for="{{tags}}" wx:key="*this">{{item}}</text>
+    </view>
+    <view class="service-stats">
+      <text class="stat">⭐ {{rating}}</text>
+      <text class="stat">{{orderCount}}单</text>
+    </view>
+    <view class="service-price">
+      <text class="price">¥{{price}}</text>
+      <text class="price-unit">/次</text>
+    </view>
+  </view>
+</view>

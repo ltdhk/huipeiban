@@ -88,27 +88,16 @@ def register_error_handlers(app):
 
 def configure_logging(app):
     """配置日志"""
-    import logging
-    from logging.handlers import RotatingFileHandler
-    import os
+    from app.utils.logger import setup_logging, log_request, log_error
 
-    if not app.debug and not app.testing:
-        # 创建日志目录
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
+    # 设置日志系统
+    setup_logging(app)
 
-        # 文件日志处理器
-        file_handler = RotatingFileHandler(
-            'logs/carelink.log',
-            maxBytes=10240000,  # 10MB
-            backupCount=10,
-            encoding='utf-8'
-        )
-        file_handler.setFormatter(logging.Formatter(
-            '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
-        ))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
+    # 配置请求日志（开发环境）
+    if app.debug:
+        log_request(app)
 
-    app.logger.setLevel(logging.INFO)
+    # 配置错误日志
+    log_error(app)
+
     app.logger.info('CareLink 应用启动')

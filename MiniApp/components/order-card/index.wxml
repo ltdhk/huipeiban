@@ -1,0 +1,23 @@
+<view class="order-card" bindtap="onTap">
+  <view class="order-header">
+    <text class="order-number">订单号: {{orderNo}}</text>
+    <text class="order-status {{statusClass}}">{{statusText}}</text>
+  </view>
+
+  <view class="order-content">
+    <image class="service-image" src="{{image}}" mode="aspectFill"></image>
+    <view class="service-info">
+      <text class="service-title">{{title}}</text>
+      <text class="service-time">服务时间: {{serviceTime}}</text>
+      <text class="service-price">¥{{price}}</text>
+    </view>
+  </view>
+
+  <view class="order-footer" wx:if="{{showActions}}">
+    <view class="order-actions">
+      <button wx:if="{{showPay}}" class="action-btn primary" data-id="{{orderId}}" catchtap="handlePay">去支付</button>
+      <button wx:if="{{showCancel}}" class="action-btn" data-id="{{orderId}}" catchtap="handleCancel">取消订单</button>
+      <button wx:if="{{showReview}}" class="action-btn primary" data-id="{{orderId}}" catchtap="handleReview">评价</button>
+    </view>
+  </view>
+</view>

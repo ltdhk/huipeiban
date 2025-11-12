@@ -74,6 +74,8 @@ class DevelopmentConfig(Config):
     """开发环境配置"""
     DEBUG = True
     SQLALCHEMY_ECHO = True
+    # 开发环境使用 SQLite（Windows 环境下更方便）
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///carelink_dev.db')
 
 
 class ProductionConfig(Config):

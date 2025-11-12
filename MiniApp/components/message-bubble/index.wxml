@@ -1,0 +1,8 @@
+<view class="message-bubble-wrapper {{role === 'user' ? 'user' : 'assistant'}}">
+  <image wx:if="{{role === 'assistant'}}" class="avatar" src="{{avatar}}" mode="aspectFill"></image>
+  <view class="message-bubble">
+    <text class="message-text">{{content}}</text>
+    <text class="message-time">{{time}}</text>
+  </view>
+  <image wx:if="{{role === 'user'}}" class="avatar" src="{{avatar}}" mode="aspectFill"></image>
+</view>
