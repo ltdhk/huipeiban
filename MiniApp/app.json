@@ -28,33 +28,23 @@
     "list": [
       {
         "pagePath": "pages/home/home",
-        "text": "首页",
-        "iconPath": "assets/icons/home.png",
-        "selectedIconPath": "assets/icons/home-active.png"
+        "text": "首页"
       },
       {
         "pagePath": "pages/ai-chat/ai-chat",
-        "text": "AI陪诊",
-        "iconPath": "assets/icons/ai.png",
-        "selectedIconPath": "assets/icons/ai-active.png"
+        "text": "AI陪诊"
       },
       {
         "pagePath": "pages/orders/list",
-        "text": "订单",
-        "iconPath": "assets/icons/orders.png",
-        "selectedIconPath": "assets/icons/orders-active.png"
+        "text": "订单"
       },
       {
         "pagePath": "pages/messages/list",
-        "text": "消息",
-        "iconPath": "assets/icons/messages.png",
-        "selectedIconPath": "assets/icons/messages-active.png"
+        "text": "消息"
       },
       {
         "pagePath": "pages/profile/index",
-        "text": "我的",
-        "iconPath": "assets/icons/profile.png",
-        "selectedIconPath": "assets/icons/profile-active.png"
+        "text": "我的"
       }
     ]
   },
