@@ -6,14 +6,14 @@ import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { login } from '@/api/auth';
-import type { LoginForm } from '@/types';
+import type { LoginForm as LoginFormType } from '@/types';
 import './Login.css';
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const onFinish = async (values: LoginForm) => {
+  const onFinish = async (values: LoginFormType) => {
     setLoading(true);
     try {
       const data = await login(values);

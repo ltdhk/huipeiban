@@ -2,7 +2,7 @@
  * 认证相关 API
  */
 import request from '@/utils/request';
-import { LoginForm, LoginResponse } from '@/types';
+import type { LoginForm, LoginResponse } from '@/types';
 
 // 管理员登录
 export const login = (data: LoginForm): Promise<LoginResponse> => {
