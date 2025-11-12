@@ -17,8 +17,8 @@
   "usingComponents": {},
   "window": {
     "navigationBarTitleText": "会照护",
-    "navigationStyle": "custom",
-    "navigationBarTextStyle": "@navTxtStyle"
+    "navigationBarTextStyle": "@navTxtStyle",
+    "navigationBarBackgroundColor": "#667eea"
   },
   "tabBar": {
     "color": "@tabBarColor",
