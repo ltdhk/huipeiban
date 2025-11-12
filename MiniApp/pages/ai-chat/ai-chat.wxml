@@ -1,0 +1,25 @@
+<view class="ai-chat-container">
+  <view class="chat-header">
+    <text class="header-title">AI智能陪诊助手</text>
+  </view>
+
+  <scroll-view class="chat-messages" scroll-y scroll-into-view="{{scrollIntoView}}">
+    <view wx:for="{{messages}}" wx:key="index" class="message-item {{item.role === 'user' ? 'user' : 'assistant'}}">
+      <view class="message-bubble">
+        <text class="message-text">{{item.content}}</text>
+      </view>
+    </view>
+    <view id="bottom"></view>
+  </scroll-view>
+
+  <view class="chat-input">
+    <input
+      class="input-box"
+      type="text"
+      placeholder="请在这里输入您的问题..."
+      value="{{inputText}}"
+      bindinput="onInput"
+    />
+    <button class="send-btn" bindtap="sendMessage">发送</button>
+  </view>
+</view>

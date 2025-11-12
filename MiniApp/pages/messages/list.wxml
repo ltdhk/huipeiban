@@ -1,0 +1,21 @@
+<view class="messages-container">
+  <scroll-view class="message-list" scroll-y>
+    <view class="message-item" wx:for="{{messages}}" wx:key="id" data-id="{{item.id}}" bindtap="goToChat">
+      <image class="avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+      <view class="message-content">
+        <view class="message-header">
+          <text class="name">{{item.name}}</text>
+          <text class="time">{{item.time}}</text>
+        </view>
+        <text class="last-message">{{item.lastMessage}}</text>
+      </view>
+      <view class="badge" wx:if="{{item.unreadCount > 0}}">
+        <text class="badge-text">{{item.unreadCount}}</text>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{messages.length === 0}}">
+      <text>暂无消息</text>
+    </view>
+  </scroll-view>
+</view>

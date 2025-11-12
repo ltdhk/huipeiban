@@ -1,0 +1,153 @@
+/* MiniApp/pages/companions/list.wxss */
+.companions-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 搜索栏 */
+.search-bar {
+  padding: 24rpx;
+  background-color: #ffffff;
+}
+
+.search-input {
+  height: 72rpx;
+  padding: 0 24rpx;
+  background-color: #f5f5f5;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+}
+
+/* 筛选标签 */
+.filter-tags {
+  display: flex;
+  padding: 24rpx;
+  background-color: #ffffff;
+  white-space: nowrap;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.tag-item {
+  display: inline-block;
+  padding: 12rpx 32rpx;
+  margin-right: 16rpx;
+  font-size: 26rpx;
+  color: #666666;
+  background-color: #f5f5f5;
+  border-radius: 32rpx;
+  transition: all 0.3s;
+}
+
+.tag-item.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 陪诊师列表 */
+.companions-list {
+  flex: 1;
+  padding: 16rpx 24rpx;
+}
+
+.companion-item {
+  display: flex;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  margin-right: 24rpx;
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-right: 12rpx;
+}
+
+.verified {
+  padding: 4rpx 12rpx;
+  background-color: #52c41a;
+  border-radius: 4rpx;
+}
+
+.verified-text {
+  font-size: 20rpx;
+  color: #ffffff;
+}
+
+.tags {
+  margin-bottom: 12rpx;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  margin-right: 8rpx;
+  font-size: 22rpx;
+  color: #667eea;
+  background-color: rgba(102, 126, 234, 0.1);
+  border-radius: 4rpx;
+}
+
+.intro {
+  font-size: 24rpx;
+  color: #666666;
+  margin-bottom: 12rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stats {
+  display: flex;
+  gap: 24rpx;
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.price-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.price {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #f5222d;
+}
+
+.price-unit {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.loading, .no-more {
+  text-align: center;
+  padding: 32rpx;
+  font-size: 24rpx;
+  color: #999999;
+}

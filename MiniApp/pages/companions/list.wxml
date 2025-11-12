@@ -1,0 +1,53 @@
+<view class="companions-container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索陪诊师..." bindinput="onSearchInput" value="{{searchText}}" />
+  </view>
+
+  <!-- 筛选标签 -->
+  <scroll-view class="filter-tags" scroll-x>
+    <view class="tag-item {{currentFilter === '' ? 'active' : ''}}" data-filter="" bindtap="onFilterChange">
+      全部
+    </view>
+    <view class="tag-item {{currentFilter === 'high-rating' ? 'active' : ''}}" data-filter="high-rating" bindtap="onFilterChange">
+      高评分
+    </view>
+    <view class="tag-item {{currentFilter === 'experienced' ? 'active' : ''}}" data-filter="experienced" bindtap="onFilterChange">
+      经验丰富
+    </view>
+    <view class="tag-item {{currentFilter === 'professional' ? 'active' : ''}}" data-filter="professional" bindtap="onFilterChange">
+      专业认证
+    </view>
+  </scroll-view>
+
+  <!-- 陪诊师列表 -->
+  <scroll-view class="companions-list" scroll-y bindscrolltolower="loadMore">
+    <view class="companion-item" wx:for="{{companions}}" wx:key="id" data-id="{{item.id}}" bindtap="goToDetail">
+      <image class="avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+      <view class="info">
+        <view class="name-row">
+          <text class="name">{{item.name}}</text>
+          <view class="verified" wx:if="{{item.verified}}">
+            <text class="verified-text">已认证</text>
+          </view>
+        </view>
+        <view class="tags">
+          <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+        </view>
+        <text class="intro">{{item.introduction}}</text>
+        <view class="stats">
+          <text class="stat-item">⭐ {{item.rating}}</text>
+          <text class="stat-item">服务 {{item.orderCount}} 次</text>
+          <text class="stat-item">{{item.serviceYears}}年经验</text>
+        </view>
+      </view>
+      <view class="price-section">
+        <text class="price">¥{{item.price}}</text>
+        <text class="price-unit">/次</text>
+      </view>
+    </view>
+
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+    <view class="no-more" wx:if="{{noMore}}">没有更多了</view>
+  </scroll-view>
+</view>

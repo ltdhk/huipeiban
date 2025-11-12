@@ -1,0 +1,38 @@
+<view class="orders-container">
+  <view class="tabs">
+    <view class="tab-item {{currentTab === 0 ? 'active' : ''}}" data-tab="0" bindtap="switchTab">全部</view>
+    <view class="tab-item {{currentTab === 1 ? 'active' : ''}}" data-tab="1" bindtap="switchTab">待支付</view>
+    <view class="tab-item {{currentTab === 2 ? 'active' : ''}}" data-tab="2" bindtap="switchTab">进行中</view>
+    <view class="tab-item {{currentTab === 3 ? 'active' : ''}}" data-tab="3" bindtap="switchTab">已完成</view>
+  </view>
+
+  <scroll-view class="order-list" scroll-y>
+    <view class="order-item" wx:for="{{orders}}" wx:key="id" data-id="{{item.id}}" bindtap="goToDetail">
+      <view class="order-header">
+        <text class="order-number">订单号: {{item.orderNo}}</text>
+        <text class="order-status {{item.statusClass}}">{{item.statusText}}</text>
+      </view>
+
+      <view class="order-content">
+        <image class="service-image" src="{{item.image}}" mode="aspectFill"></image>
+        <view class="service-info">
+          <text class="service-title">{{item.title}}</text>
+          <text class="service-time">服务时间: {{item.serviceTime}}</text>
+          <text class="service-price">¥{{item.price}}</text>
+        </view>
+      </view>
+
+      <view class="order-footer">
+        <view class="order-actions">
+          <button wx:if="{{item.showPay}}" class="action-btn primary" data-id="{{item.id}}" catchtap="handlePay">去支付</button>
+          <button wx:if="{{item.showCancel}}" class="action-btn" data-id="{{item.id}}" catchtap="handleCancel">取消订单</button>
+          <button wx:if="{{item.showReview}}" class="action-btn primary" data-id="{{item.id}}" catchtap="handleReview">评价</button>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{orders.length === 0}}">
+      <text>暂无订单</text>
+    </view>
+  </scroll-view>
+</view>
