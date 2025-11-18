@@ -15,21 +15,23 @@ const config = {
  * 获取存储的 token
  */
 function getToken() {
-  return wx.getStorageSync('token') || '';
+  return wx.getStorageSync('access_token') || '';
 }
 
 /**
  * 设置 token
  */
 function setToken(token) {
-  wx.setStorageSync('token', token);
+  wx.setStorageSync('access_token', token);
 }
 
 /**
  * 清除 token
  */
 function clearToken() {
-  wx.removeStorageSync('token');
+  wx.removeStorageSync('access_token');
+  wx.removeStorageSync('refresh_token');
+  wx.removeStorageSync('userInfo');
 }
 
 /**
@@ -63,28 +65,29 @@ function responseInterceptor(res, resolve, reject) {
   if (statusCode === 200 || statusCode === 201) {
     // 统一处理业务响应格式
     if (data.success) {
-      resolve(data.data);
+      // 返回完整的响应对象，包括 data 和 message
+      resolve(data);
     } else {
       wx.showToast({
-        title: data.message || '请求失败',
+        title: data.error?.message || data.message || '请求失败',
         icon: 'none',
         duration: 2000
       });
       reject(data);
     }
-  } else if (statusCode === 401) {
-    // token 失效，清除登录信息，跳转登录页
+  } else if (statusCode === 401 || (statusCode === 422 && data.msg === 'Not enough segments')) {
+    // token 失效或格式错误，清除登录信息，跳转登录页
     clearToken();
-    wx.showToast({
-      title: '登录已失效，请重新登录',
-      icon: 'none',
-      duration: 2000
+    wx.showModal({
+      title: '提示',
+      content: '登录已过期，请重新登录',
+      showCancel: false,
+      success: () => {
+        wx.reLaunch({
+          url: '/pages/login/login'
+        });
+      }
     });
-    setTimeout(() => {
-      wx.reLaunch({
-        url: '/pages/login/login'
-      });
-    }, 2000);
     reject(data);
   } else if (statusCode === 403) {
     wx.showToast({

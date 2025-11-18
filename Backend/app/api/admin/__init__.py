@@ -6,5 +6,5 @@ from flask import Blueprint
 
 admin_bp = Blueprint('admin', __name__)
 
-# 导入路由（后续添加）
-# from app.api.admin import auth, users, orders
+# 导入路由
+from app.api.admin import auth

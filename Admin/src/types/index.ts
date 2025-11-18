@@ -105,6 +105,8 @@ export interface LoginForm {
 
 // 登录响应
 export interface LoginResponse {
-  token: string;
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
   admin: Admin;
 }

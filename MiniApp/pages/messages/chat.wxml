@@ -1,2 +1,59 @@
-<!--pages/messages/chat.wxml-->
-<text>pages/messages/chat.wxml</text>
+<view class="chat-container">
+  <!-- 消息列表 -->
+  <scroll-view
+    class="chat-messages"
+    scroll-y
+    scroll-into-view="{{scrollIntoView}}"
+    scroll-with-animation
+  >
+    <!-- 加载更多 -->
+    <view wx:if="{{loading && messages.length > 0}}" class="loading-history">
+      <text>加载历史消息中...</text>
+    </view>
+
+    <!-- 消息项 -->
+    <view
+      wx:for="{{messages}}"
+      wx:key="id"
+      class="message-item {{item.sender_type === 'user' ? 'user-message' : 'other-message'}}"
+    >
+      <view class="message-wrapper">
+        <view class="message-bubble">
+          <text class="message-text">{{item.content}}</text>
+        </view>
+      </view>
+      <view class="message-time">
+        <text>{{item.created_at}}</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{messages.length === 0 && !loading}}" class="empty">
+      <text class="empty-text">暂无消息</text>
+      <text class="empty-hint">发送消息开始对话</text>
+    </view>
+
+    <!-- 锚点元素 -->
+    <view id="bottom"></view>
+  </scroll-view>
+
+  <!-- 输入区域 -->
+  <view class="chat-input">
+    <input
+      class="input-box"
+      type="text"
+      placeholder="请输入消息..."
+      value="{{inputText}}"
+      bindinput="onInput"
+      confirm-type="send"
+      bindconfirm="sendMessage"
+    />
+    <button
+      class="send-btn {{inputText ? 'active' : ''}}"
+      bindtap="sendMessage"
+      disabled="{{sending || !inputText}}"
+    >
+      发送
+    </button>
+  </view>
+</view>

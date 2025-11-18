@@ -9,7 +9,7 @@ Flask-RESTX==1.3.0
 Flask-Cors==4.0.0
 
 # 数据库 (开发环境暂时使用 SQLite，生产环境使用 PostgreSQL)
-# psycopg2-binary==2.9.9  # PostgreSQL 驱动（Windows 安装需要编译工具）
+psycopg2-binary==2.9.11  # PostgreSQL 驱动（Windows 安装需要编译工具）
 
 # AI 相关
 langchain==0.1.0

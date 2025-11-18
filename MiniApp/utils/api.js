@@ -8,8 +8,15 @@ const { get, post, put, delete: del } = require('./request.js');
 /**
  * 微信登录
  */
-function wechatLogin(code) {
-  return post('/user/auth/wechat-login', { code });
+function wechatLogin(data) {
+  return post('/user/auth/wechat-login', data);
+}
+
+/**
+ * 登录（微信登录的别名，用于登录页面）
+ */
+function login(data) {
+  return wechatLogin(data);
 }
 
 /**
@@ -190,24 +197,45 @@ function getPaymentStatus(paymentId) {
 // ============= 消息 =============
 
 /**
- * 获取消息列表
+ * 获取会话列表
  */
-function getMessages(params) {
-  return get('/user/messages', params);
+function getConversations(params) {
+  return get('/user/messages/conversations', params);
 }
 
 /**
- * 获取聊天记录
+ * 获取会话消息
  */
-function getChatHistory(conversationId, params) {
-  return get(`/user/messages/${conversationId}/history`, params);
+function getConversationMessages(conversationId, params) {
+  return get(`/user/messages/conversations/${conversationId}`, params);
 }
 
 /**
  * 发送消息
  */
-function sendMessage(data) {
-  return post('/user/messages/send', data);
+function sendMessage(conversationId, data) {
+  return post(`/user/messages/conversations/${conversationId}/messages`, data);
+}
+
+/**
+ * 创建会话
+ */
+function createConversation(data) {
+  return post('/user/messages/conversations', data);
+}
+
+/**
+ * 获取未读消息数
+ */
+function getUnreadCount() {
+  return get('/user/messages/unread-count');
+}
+
+/**
+ * 归档会话
+ */
+function archiveConversation(conversationId) {
+  return del(`/user/messages/conversations/${conversationId}`);
 }
 
 // ============= AI 对话 =============
@@ -242,8 +270,37 @@ function getReviews(params) {
   return get('/user/reviews', params);
 }
 
+/**
+ * 获取评价详情
+ */
+function getReviewDetail(id) {
+  return get(`/user/reviews/${id}`);
+}
+
+/**
+ * 删除评价
+ */
+function deleteReview(id) {
+  return del(`/user/reviews/${id}`);
+}
+
+/**
+ * 设置默认就诊人
+ */
+function setDefaultPatient(id) {
+  return post(`/user/patients/${id}/set-default`);
+}
+
+/**
+ * 设置默认地址
+ */
+function setDefaultAddress(id) {
+  return post(`/user/addresses/${id}/set-default`);
+}
+
 module.exports = {
   // 认证
+  login,
   wechatLogin,
   refreshToken,
   bindPhone,
@@ -257,12 +314,14 @@ module.exports = {
   createPatient,
   updatePatient,
   deletePatient,
+  setDefaultPatient,
 
   // 地址
   getAddresses,
   createAddress,
   updateAddress,
   deleteAddress,
+  setDefaultAddress,
 
   // 陪诊师
   getCompanions,
@@ -284,9 +343,12 @@ module.exports = {
   getPaymentStatus,
 
   // 消息
-  getMessages,
-  getChatHistory,
+  getConversations,
+  getConversationMessages,
   sendMessage,
+  createConversation,
+  getUnreadCount,
+  archiveConversation,
 
   // AI
   aiChat,
@@ -294,5 +356,7 @@ module.exports = {
 
   // 评价
   createReview,
-  getReviews
+  getReviews,
+  getReviewDetail,
+  deleteReview
 };

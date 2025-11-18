@@ -3,16 +3,9 @@
 应用工厂函数
 """
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from config import config
-
-# 初始化扩展
-db = SQLAlchemy()
-migrate = Migrate()
-jwt = JWTManager()
+from app.extensions import db, migrate, jwt
 
 
 def create_app(config_name='default'):
@@ -45,16 +38,37 @@ def create_app(config_name='default'):
     # 配置日志
     configure_logging(app)
 
+    # 注册健康检查端点
+    register_health_check(app)
+
     return app
 
 
 def register_blueprints(app):
     """注册蓝图"""
     from app.api.user import user_bp
+    from app.api.user.ai import bp as ai_bp
+    from app.api.user.companion import bp as companion_bp
+    from app.api.user.institution import bp as institution_bp
+    from app.api.user.order import bp as order_bp
+    from app.api.user.payment import bp as payment_bp
+    from app.api.user.patient import bp as patient_bp
+    from app.api.user.address import bp as address_bp
+    from app.api.user.message import bp as message_bp
+    from app.api.user.review import bp as review_bp
     from app.api.admin import admin_bp
 
     # 用户端 API
     app.register_blueprint(user_bp, url_prefix='/api/v1/user')
+    app.register_blueprint(ai_bp)  # AI 接口（已包含 /api/v1/user/ai 前缀）
+    app.register_blueprint(companion_bp)  # 陪诊师接口（已包含 /api/v1/user/companions 前缀）
+    app.register_blueprint(institution_bp)  # 机构接口（已包含 /api/v1/user/institutions 前缀）
+    app.register_blueprint(order_bp)  # 订单接口（已包含 /api/v1/user/orders 前缀）
+    app.register_blueprint(payment_bp)  # 支付接口（已包含 /api/v1/user/payments 前缀）
+    app.register_blueprint(patient_bp)  # 就诊人接口（已包含 /api/v1/user/patients 前缀）
+    app.register_blueprint(address_bp)  # 地址接口（已包含 /api/v1/user/addresses 前缀）
+    app.register_blueprint(message_bp)  # 消息接口（已包含 /api/v1/user/messages 前缀）
+    app.register_blueprint(review_bp)  # 评价接口（已包含 /api/v1/user/reviews 前缀）
 
     # 管理端 API
     app.register_blueprint(admin_bp, url_prefix='/api/v1/admin')
@@ -97,7 +111,29 @@ def configure_logging(app):
     if app.debug:
         log_request(app)
 
-    # 配置错误日志
-    log_error(app)
+
+def register_health_check(app):
+    """注册健康检查端点"""
+    from flask import jsonify
+    from datetime import datetime
+
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        """健康检查接口"""
+        return jsonify({
+            'status': 'healthy',
+            'timestamp': datetime.utcnow().isoformat(),
+            'service': 'CareLink API',
+            'version': '1.0.0'
+        }), 200
+
+    @app.route('/', methods=['GET'])
+    def index():
+        """根路径"""
+        return jsonify({
+            'message': 'Welcome to CareLink API',
+            'version': '1.0.0',
+            'docs': '/api/docs'
+        }), 200
 
     app.logger.info('CareLink 应用启动')

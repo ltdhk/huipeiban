@@ -1,10 +1,24 @@
 <view class="profile-container">
   <!-- 用户信息 -->
   <view class="user-section">
-    <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill"></image>
+    <image class="avatar" src="{{userInfo.avatar_url || '/assets/default-avatar.png'}}" mode="aspectFill"></image>
     <view class="user-info">
       <text class="nickname">{{userInfo.nickname || '点击登录'}}</text>
       <text class="phone" wx:if="{{userInfo.phone}}">{{userInfo.phone}}</text>
+      <view class="user-stats" wx:if="{{userInfo.id}}">
+        <view class="stat-item">
+          <text class="stat-value">{{userInfo.balance || 0}}</text>
+          <text class="stat-label">余额</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value">{{userInfo.points || 0}}</text>
+          <text class="stat-label">积分</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value">{{userInfo.total_orders || 0}}</text>
+          <text class="stat-label">订单</text>
+        </view>
+      </view>
     </view>
   </view>
 

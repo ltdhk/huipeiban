@@ -1,0 +1,52 @@
+<view class="edit-container">
+  <view class="form">
+    <view class="form-item required">
+      <text class="label">联系人</text>
+      <input class="input" placeholder="请输入联系人" value="{{formData.contact_name}}" data-field="contact_name" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item required">
+      <text class="label">联系电话</text>
+      <input class="input" type="number" placeholder="请输入联系电话" value="{{formData.contact_phone}}" data-field="contact_phone" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item required">
+      <text class="label">所在地区</text>
+      <picker mode="region" value="{{[formData.province, formData.city, formData.district]}}" bindchange="onRegionChange">
+        <view class="picker">
+          {{formData.province || formData.city || formData.district ? formData.province + formData.city + formData.district : '请选择省市区'}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item required">
+      <text class="label">详细地址</text>
+      <textarea class="textarea" placeholder="请输入详细地址" value="{{formData.detail_address}}" data-field="detail_address" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item">
+      <text class="label">地址类型</text>
+      <picker mode="selector" range="{{addressTypes}}" range-key="label" bindchange="onTypeChange">
+        <view class="picker">
+          {{addressTypes.find(item => item.value === formData.address_type).label}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">地址标签</text>
+      <input class="input" placeholder="自定义标签（选填）" value="{{formData.label}}" data-field="label" bindinput="onInputChange" />
+    </view>
+
+    <view class="form-item switch-item">
+      <text class="label">设为默认地址</text>
+      <switch checked="{{formData.is_default}}" bindchange="onDefaultChange" color="#667eea" />
+    </view>
+  </view>
+
+  <view class="submit-wrapper">
+    <button class="submit-btn" bindtap="submitForm" disabled="{{submitting}}">
+      {{submitting ? '保存中...' : '保存'}}
+    </button>
+  </view>
+</view>

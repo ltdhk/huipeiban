@@ -97,7 +97,7 @@ export default function MainLayout() {
           onClick={handleMenuClick}
         />
       </Sider>
-      <Layout>
+      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
         <Header className="site-layout-header">
           <Button
             type="text"

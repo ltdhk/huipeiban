@@ -4,7 +4,8 @@
 """
 from app import db
 from datetime import datetime
-from sqlalchemy import Index
+from sqlalchemy import Index, event
+import time
 
 
 class User(db.Model):
@@ -14,7 +15,7 @@ class User(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
 
     # 基本信息
-    phone = db.Column(db.String(20), unique=True, nullable=False, comment='手机号（加密存储）')
+    phone = db.Column(db.String(20), unique=True, nullable=True, comment='手机号（加密存储）')
     password_hash = db.Column(db.String(255), comment='密码哈希')
     nickname = db.Column(db.String(50), comment='昵称')
     avatar_url = db.Column(db.String(255), comment='头像URL')
@@ -57,9 +58,15 @@ class User(db.Model):
 
     def to_dict(self, include_sensitive=False):
         """转换为字典"""
+        # 处理手机号脱敏
+        if self.phone:
+            phone = self.phone if include_sensitive else self.phone[:3] + '****' + self.phone[-4:]
+        else:
+            phone = None
+
         data = {
             'id': self.id,
-            'phone': self.phone if include_sensitive else self.phone[:3] + '****' + self.phone[-4:],
+            'phone': phone,
             'nickname': self.nickname,
             'avatar_url': self.avatar_url,
             'gender': self.gender,
@@ -74,6 +81,22 @@ class User(db.Model):
             'last_login_at': self.last_login_at.isoformat() if self.last_login_at else None
         }
         return data
+
+
+# 自动生成用户 ID（使用毫秒级时间戳 + 微秒）
+_last_user_id = 0
+@event.listens_for(User, 'before_insert')
+def generate_user_id(mapper, connection, target):
+    """在插入用户之前自动生成 ID"""
+    global _last_user_id
+    if target.id is None:
+        # 使用微秒级时间戳确保唯一性
+        current_id = int(time.time() * 1000000)
+        # 如果与上一个 ID 相同，则递增
+        if current_id <= _last_user_id:
+            current_id = _last_user_id + 1
+        _last_user_id = current_id
+        target.id = current_id
 
 
 class Patient(db.Model):
@@ -117,16 +140,21 @@ class Patient(db.Model):
         """转换为字典"""
         return {
             'id': self.id,
+            'user_id': self.user_id,
             'name': self.name,
             'gender': self.gender,
             'birth_date': self.birth_date.isoformat() if self.birth_date else None,
             'phone': self.phone,
+            'id_card': self.id_card,
             'relationship': self.relationship,
             'medical_history': self.medical_history,
             'allergies': self.allergies,
             'special_needs': self.special_needs,
+            'insurance_type': self.insurance_type,
+            'insurance_number': self.insurance_number,
             'is_default': self.is_default,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
 
 

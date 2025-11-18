@@ -25,6 +25,22 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False  # 生产环境设为 False
 
+    # 数据库连接池配置 - 解决 Supabase 连接超时问题
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,          # 每次连接前检查连接是否有效
+        'pool_recycle': 300,            # 5分钟后回收连接
+        'pool_size': 10,                # 连接池大小
+        'max_overflow': 20,             # 最大溢出连接数
+        'pool_timeout': 30,             # 连接超时时间（秒）
+        'connect_args': {
+            'connect_timeout': 10,      # TCP 连接超时
+            'keepalives': 1,            # 启用 TCP keepalive
+            'keepalives_idle': 30,      # keepalive 空闲时间
+            'keepalives_interval': 10,  # keepalive 间隔
+            'keepalives_count': 5,      # keepalive 重试次数
+        }
+    }
+
     # JWT 配置
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-please-change')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 7200)))
@@ -74,8 +90,7 @@ class DevelopmentConfig(Config):
     """开发环境配置"""
     DEBUG = True
     SQLALCHEMY_ECHO = True
-    # 开发环境使用 SQLite（Windows 环境下更方便）
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///carelink_dev.db')
+    # 开发环境也使用 Supabase PostgreSQL
 
 
 class ProductionConfig(Config):

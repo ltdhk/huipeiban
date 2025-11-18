@@ -1,112 +1,67 @@
-# CareLink 医疗陪诊服务平台
+# 🏥 CareLink - 智能陪诊服务平台
 
-基于 AI Native 理念打造的智能陪诊预约服务平台。
+> 一个完整的医疗陪诊服务平台，包含小程序端、管理后台和后端 API
 
-## 项目简介
+## 🚀 快速开始
 
-CareLink 通过 AI 对话助手帮助用户快速匹配合适的陪诊服务，连接有陪诊需求的用户、专业陪诊师和陪诊机构。
+### 📖 阅读文档
 
-### 核心特色
+- **[快速启动指南](QUICKSTART.md)** ← 推荐！5分钟快速启动
+- **[完整设置指南](SETUP.md)** - 详细配置说明
+- **[开发路线图](Docs/ROADMAP.md)** - 功能规划
 
-- 🤖 **AI Native 交互**：基于 LangChain 构建的智能对话系统
-- 🎯 **智能匹配推荐**：多维度因素智能推荐陪诊服务
-- 💳 **双轨服务模式**：支持陪诊师直约（在线支付）和机构预约（线下服务）
-- 📱 **全流程数字化**：从需求采集到服务完成的完整闭环
-
-## 技术栈
-
-### 后端
-- **框架**：Flask 3.x
-- **数据库**：Supabase PostgreSQL
-- **AI**：LangChain + OpenRouter
-- **支付**：微信支付 V3
-
-### 前端
-- **小程序**：微信小程序 + TDesign
-- **管理后台**：React 18 + Ant Design 5
-
-## 项目结构
-
-```
-CareLink/
-├── Backend/           # Flask 后端
-├── MiniApp/           # 微信小程序
-├── Admin/             # React 管理后台
-├── Docs/              # 项目文档
-├── Script/            # 脚本工具
-└── CLAUDE.md          # 开发指南
-```
-
-## 快速开始
-
-### 后端开发
+### ⚡ 一键启动
 
 ```bash
+# 1. 后端 API
 cd Backend
-
-# 创建虚拟环境
-python -m venv venv
-
-# 激活虚拟环境 (Windows)
-venv\Scripts\activate
-
-# 安装依赖
-pip install -r requirements.txt
-
-# 复制环境变量配置
+python -m venv venv && venv\Scripts\activate
+pip install flask flask-sqlalchemy flask-migrate flask-jwt-extended flask-cors python-dotenv openai requests werkzeug
 copy .env.example .env
-# 编辑 .env 文件，填写配置信息
-
-# 初始化数据库
-flask db init
-flask db migrate -m "初始迁移"
-flask db upgrade
-
-# 启动开发服务器
+python -m flask db init && python -m flask db migrate -m "Init" && python -m flask db upgrade
+python scripts/init_test_data.py
 python run.py
+
+# 2. 小程序
+# 用微信开发者工具打开 MiniApp 目录，勾选「不校验合法域名」
+
+# 3. 测试 API
+curl http://localhost:5000/health
 ```
 
-### 小程序开发
+## 📊 项目状态
 
-1. 使用微信开发者工具打开 `MiniApp/` 目录
-2. 配置 AppID
-3. 开始开发
+✅ **已完成** (Week 3-10):
+- AI 智能助手 (Week 3, 9)
+- 陪诊师/机构管理 (Week 5-6)
+- 订单与支付 (Week 7-8)
+- 用户中心 (Week 10)
+- 消息系统 (Week 10)
+- 评价系统 (Week 10)
 
-### 管理后台开发
+📅 **规划中** (Week 11-12):
+- 测试与优化
+- 管理后台
 
-```bash
-cd Admin
+## 🏗️ 技术栈
 
-# 安装依赖
-npm install
+- **后端**: Flask + SQLAlchemy + JWT
+- **小程序**: 微信原生 + TDesign
+- **管理后台**: React 19 + Ant Design 5
+- **AI**: OpenRouter (Claude 3.5 Sonnet)
+- **数据库**: SQLite / PostgreSQL
 
-# 启动开发服务器
-npm run dev
+## 📝 默认账号
+
+```
+管理员: admin / admin123
+测试用户: 13800138001 / 123456
 ```
 
-## 文档
+## 📚 更多信息
 
-详细文档请查看 [Docs/](./Docs/) 目录：
+查看 [QUICKSTART.md](QUICKSTART.md) 开始使用！
 
-- [PRD.md](./Docs/PRD.md) - 产品需求文档
-- [DATABASE.md](./Docs/DATABASE.md) - 数据库设计
-- [API.md](./Docs/API.md) - API 接口文档
-- [AI_AGENT.md](./Docs/AI_AGENT.md) - AI Agent 设计
-- [PAYMENT.md](./Docs/PAYMENT.md) - 微信支付集成
-- [ROADMAP.md](./Docs/ROADMAP.md) - 开发路线图
+---
 
-## 开发规范
-
-请遵循 [CLAUDE.md](./CLAUDE.md) 中的开发规范：
-
-- 代码注释和日志使用简体中文
-- 遵循 RESTful API 设计规范
-- 使用约定式提交(Conventional Commits)格式
-
-## 许可证
-
-待定
-
-## 联系方式
-
-如有问题，请联系项目负责人。
+**Made with ❤️ by CareLink Team**

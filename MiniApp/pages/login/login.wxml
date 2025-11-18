@@ -1,0 +1,63 @@
+<!-- 登录页面 -->
+<view class="login-container">
+  <!-- Logo 区域 -->
+  <view class="logo-section">
+    <image class="logo" src="/assets/logo.png" mode="aspectFit"></image>
+    <text class="app-name">会照护</text>
+    <text class="app-slogan">让每一次就医都有人陪伴</text>
+  </view>
+
+  <!-- 功能介绍 -->
+  <view class="features">
+    <view class="feature-item">
+      <t-icon name="user" size="48rpx" color="#667eea" />
+      <text class="feature-text">专业陪诊师</text>
+    </view>
+    <view class="feature-item">
+      <t-icon name="hospital" size="48rpx" color="#667eea" />
+      <text class="feature-text">正规医疗机构</text>
+    </view>
+    <view class="feature-item">
+      <t-icon name="service" size="48rpx" color="#667eea" />
+      <text class="feature-text">全程贴心服务</text>
+    </view>
+  </view>
+
+  <!-- 登录按钮 -->
+  <view class="login-section">
+    <button
+      class="login-button"
+      open-type="getUserProfile"
+      bindtap="handleGetUserProfile"
+      wx:if="{{!isLoggedIn}}"
+    >
+      <t-icon name="wechat" size="48rpx" color="#fff" class="wechat-icon" />
+      微信一键登录
+    </button>
+
+    <button
+      class="login-button logged-in"
+      bindtap="navigateToHome"
+      wx:else
+    >
+      进入首页
+    </button>
+
+    <view class="agreement">
+      <text>登录即表示同意</text>
+      <text class="link" bindtap="showUserAgreement">《用户协议》</text>
+      <text>和</text>
+      <text class="link" bindtap="showPrivacyPolicy">《隐私政策》</text>
+    </view>
+  </view>
+
+  <!-- 加载提示 -->
+  <t-toast id="t-toast" />
+  <t-loading
+    theme="spinner"
+    size="80rpx"
+    text="登录中..."
+    visible="{{loading}}"
+    layout="vertical"
+  />
+</view>

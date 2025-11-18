@@ -18,7 +18,7 @@ const request: AxiosInstance = axios.create({
 request.interceptors.request.use(
   (config) => {
     // 添加 token
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -48,10 +48,15 @@ request.interceptors.response.use(
     if (error.response) {
       const { status, data } = error.response;
 
+      // 获取错误信息
+      const errorMessage = data?.error?.message || data?.message || '请求失败';
+
       switch (status) {
         case 401:
           message.error('未授权，请重新登录');
-          localStorage.removeItem('token');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('admin');
           window.location.href = '/login';
           break;
         case 403:
@@ -61,10 +66,10 @@ request.interceptors.response.use(
           message.error('请求的资源不存在');
           break;
         case 500:
-          message.error('服务器错误');
+          message.error(errorMessage);
           break;
         default:
-          message.error(data?.message || '请求失败');
+          message.error(errorMessage);
       }
     } else if (error.request) {
       message.error('网络错误，请检查网络连接');

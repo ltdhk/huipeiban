@@ -1,8 +1,8 @@
 {
   "darkmode": true,
   "pages": [
+    "pages/login/login",
     "pages/home/home",
-    "pages/ai-chat/ai-chat",
     "pages/companions/list",
     "pages/companions/detail",
     "pages/institutions/list",
@@ -19,34 +19,6 @@
     "navigationBarTitleText": "会照护",
     "navigationBarTextStyle": "@navTxtStyle",
     "navigationBarBackgroundColor": "#667eea"
-  },
-  "tabBar": {
-    "color": "@tabBarColor",
-    "selectedColor": "@tabBarSelectedColor",
-    "backgroundColor": "@tabBarBgColor",
-    "borderStyle": "@tabBarBorderStyle",
-    "list": [
-      {
-        "pagePath": "pages/home/home",
-        "text": "首页"
-      },
-      {
-        "pagePath": "pages/ai-chat/ai-chat",
-        "text": "AI陪诊"
-      },
-      {
-        "pagePath": "pages/orders/list",
-        "text": "订单"
-      },
-      {
-        "pagePath": "pages/messages/list",
-        "text": "消息"
-      },
-      {
-        "pagePath": "pages/profile/index",
-        "text": "我的"
-      }
-    ]
   },
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",

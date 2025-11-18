@@ -1,0 +1,129 @@
+<view class="review-container">
+  <scroll-view class="review-form" scroll-y>
+    <!-- 总体评分 -->
+    <view class="rating-section">
+      <text class="section-title">总体评分</text>
+      <view class="rating-stars">
+        <view
+          wx:for="{{5}}"
+          wx:key="index"
+          class="star {{index < formData.rating ? 'active' : ''}}"
+          data-field="rating"
+          data-value="{{index + 1}}"
+          bindtap="onRatingChange"
+        >★</view>
+      </view>
+    </view>
+
+    <!-- 详细评分 -->
+    <view class="detail-rating">
+      <view class="rating-item">
+        <text class="rating-label">服务质量</text>
+        <view class="rating-stars small">
+          <view
+            wx:for="{{5}}"
+            wx:key="index"
+            class="star {{index < formData.service_rating ? 'active' : ''}}"
+            data-field="service_rating"
+            data-value="{{index + 1}}"
+            bindtap="onRatingChange"
+          >★</view>
+        </view>
+      </view>
+
+      <view class="rating-item">
+        <text class="rating-label">服务态度</text>
+        <view class="rating-stars small">
+          <view
+            wx:for="{{5}}"
+            wx:key="index"
+            class="star {{index < formData.attitude_rating ? 'active' : ''}}"
+            data-field="attitude_rating"
+            data-value="{{index + 1}}"
+            bindtap="onRatingChange"
+          >★</view>
+        </view>
+      </view>
+
+      <view class="rating-item">
+        <text class="rating-label">专业程度</text>
+        <view class="rating-stars small">
+          <view
+            wx:for="{{5}}"
+            wx:key="index"
+            class="star {{index < formData.professional_rating ? 'active' : ''}}"
+            data-field="professional_rating"
+            data-value="{{index + 1}}"
+            bindtap="onRatingChange"
+          >★</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 评价内容 -->
+    <view class="content-section">
+      <text class="section-title">评价内容</text>
+      <textarea
+        class="content-input"
+        placeholder="请描述您的服务体验..."
+        value="{{formData.content}}"
+        bindinput="onContentInput"
+        maxlength="500"
+        show-confirm-bar="{{false}}"
+      />
+      <text class="char-count">{{formData.content.length}}/500</text>
+    </view>
+
+    <!-- 评价标签 -->
+    <view class="tags-section">
+      <text class="section-title">评价标签</text>
+      <view class="tags-list">
+        <view
+          wx:for="{{availableTags}}"
+          wx:key="index"
+          class="tag {{formData.tags.includes(item) ? 'active' : ''}}"
+          data-tag="{{item}}"
+          bindtap="onTagTap"
+        >{{item}}</view>
+      </view>
+    </view>
+
+    <!-- 图片上传 -->
+    <view class="images-section">
+      <text class="section-title">上传图片（选填）</text>
+      <view class="images-list">
+        <view
+          wx:for="{{formData.images}}"
+          wx:key="index"
+          class="image-item"
+        >
+          <image
+            class="image"
+            src="{{item}}"
+            mode="aspectFill"
+            data-url="{{item}}"
+            bindtap="previewImage"
+          />
+          <view class="delete-btn" data-index="{{index}}" bindtap="deleteImage">×</view>
+        </view>
+
+        <view wx:if="{{formData.images.length < 9}}" class="add-image" bindtap="chooseImage">
+          <text>+</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 匿名选项 -->
+    <view class="anonymous-section">
+      <text>匿名评价</text>
+      <switch checked="{{formData.is_anonymous}}" bindchange="onAnonymousChange" color="#667eea" />
+    </view>
+  </scroll-view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-wrapper">
+    <button class="submit-btn" bindtap="submitReview" disabled="{{submitting}}">
+      {{submitting ? '提交中...' : '提交评价'}}
+    </button>
+  </view>
+</view>

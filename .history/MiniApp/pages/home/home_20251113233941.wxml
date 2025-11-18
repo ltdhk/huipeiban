@@ -1,0 +1,196 @@
+<view class="home-container">
+  <!-- 顶部导航栏 -->
+  <view class="top-bar">
+    <view class="menu-btn" bindtap="toggleDrawer">
+      <text class="iconfont icon-menu"></text>
+    </view>
+    <text class="app-title">会照护</text>
+    <view class="user-btn" bindtap="goToProfile">
+      <text class="iconfont icon-user"></text>
+    </view>
+  </view>
+
+  <!-- 主内容区：AI预约界面 -->
+  <scroll-view
+    class="chat-content"
+    scroll-y
+    scroll-into-view="{{scrollIntoView}}"
+    scroll-with-animation
+  >
+    <!-- 欢迎引导（仅首次显示） -->
+    <view wx:if="{{messages.length === 0}}" class="welcome-section">
+      <view class="welcome-text">
+        <text class="welcome-title">您的智能陪诊顾问，</text>
+        <text class="welcome-subtitle">快速匹配专属服务。</text>
+      </view>
+
+      <!-- 快捷预约按钮 -->
+      <view class="quick-booking-actions">
+        <view class="booking-btn" bindtap="quickBooking" data-text="周三下午2点陪我去六院看骨科">
+          <text>周三下午2点陪我去六院看骨科</text>
+        </view>
+        <view class="booking-btn" bindtap="quickBooking" data-text="明天下午帮我去华山医院取个报告">
+          <text>明天下午帮我去华山医院取个报告</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 消息列表 -->
+    <view wx:for="{{messages}}" wx:key="id" class="message-group">
+      <!-- AI助手消息 -->
+      <view wx:if="{{item.role === 'assistant'}}" class="message-item ai-message">
+        <view class="message-header">
+          <text class="iconfont icon-robot ai-avatar"></text>
+          <text class="sender-name">AI助手</text>
+        </view>
+
+        <view class="message-content">
+          <view class="message-bubble ai-bubble">
+            <text class="message-text">{{item.content}}</text>
+          </view>
+
+          <!-- 推荐的陪诊师/机构 -->
+          <view wx:if="{{item.recommendations && item.recommendations.length > 0}}" class="recommendations">
+            <view
+              wx:for="{{item.recommendations}}"
+              wx:key="id"
+              wx:for-item="rec"
+              class="rec-card"
+              bindtap="viewRecommendation"
+              data-type="{{rec.type}}"
+              data-id="{{rec.id}}"
+            >
+              <image class="rec-avatar" src="{{rec.avatar_url || rec.logo_url}}" mode="aspectFill" />
+              <view class="rec-info">
+                <view class="rec-name-row">
+                  <text class="rec-name">{{rec.name}}</text>
+                  <view class="rec-rating">
+                    <text class="iconfont">⭐</text>
+                    <text class="rating-text">{{rec.rating}}</text>
+                  </view>
+                </view>
+                <text class="rec-desc">{{rec.introduction || rec.recommendation_reason}}</text>
+                <view class="rec-tags">
+                  <text wx:if="{{rec.has_car}}" class="tag">有车</text>
+                  <text wx:if="{{rec.hourly_rate}}" class="tag">¥{{rec.hourly_rate}}/小时</text>
+                  <text wx:if="{{rec.completed_orders}}" class="tag">{{rec.completed_orders}}单</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 用户消息 -->
+      <view wx:if="{{item.role === 'user'}}" class="message-item user-message">
+        <text class="sender-label">我</text>
+        <view class="message-bubble user-bubble">
+          <text class="message-text">{{item.content}}</text>
+        </view>
+        <text class="iconfont icon-user user-avatar-icon"></text>
+      </view>
+    </view>
+
+    <!-- AI正在输入 -->
+    <view wx:if="{{loading}}" class="message-item ai-message">
+      <view class="message-header">
+        <text class="iconfont icon-robot ai-avatar"></text>
+        <text class="sender-name">AI助手</text>
+      </view>
+      <view class="message-content">
+        <view class="message-bubble ai-bubble typing">
+          <view class="typing-dots">
+            <view class="dot"></view>
+            <view class="dot"></view>
+            <view class="dot"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view id="bottom"></view>
+  </scroll-view>
+
+  <!-- 输入区域 -->
+  <view class="input-section">
+    <view class="input-container">
+      <button class="voice-btn" bindtap="startVoice">
+        <text class="iconfont icon-voice"></text>
+      </button>
+      <input
+        class="text-input"
+        type="text"
+        placeholder="请在这里输入您的问题..."
+        value="{{inputText}}"
+        bindinput="onInput"
+        bindconfirm="sendMessage"
+        confirm-type="send"
+      />
+      <button class="send-btn {{inputText ? 'active' : ''}}" bindtap="sendMessage" disabled="{{!inputText || loading}}">
+        <text class="iconfont"><image src="/assets/icons/send.png" /></text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 侧边抽屉导航 -->
+  <view class="drawer-mask {{drawerVisible ? 'visible' : ''}}" bindtap="toggleDrawer"></view>
+  <view class="drawer-container {{drawerVisible ? 'open' : ''}}">
+    <!-- 抽屉头部 -->
+    <view class="drawer-header">
+      <view class="app-icon">
+        <text class="iconfont icon-robot"></text>
+      </view>
+      <view class="app-info">
+        <text class="app-name">智能助手</text>
+        <text class="app-version">版本 v1.0</text>
+      </view>
+    </view>
+
+    <!-- 导航菜单 -->
+    <view class="drawer-menu">
+      <view
+        class="menu-item {{currentTab === 'ai' ? 'active' : ''}}"
+        bindtap="switchTab"
+        data-tab="ai"
+      >
+        <text class="iconfont icon-robot"></text>
+        <text class="menu-text">AI预约</text>
+      </view>
+
+      <view
+        class="menu-item {{currentTab === 'order' ? 'active' : ''}}"
+        bindtap="switchTab"
+        data-tab="order"
+      >
+        <text class="iconfont icon-order"></text>
+        <text class="menu-text">订单</text>
+      </view>
+
+      <view
+        class="menu-item {{currentTab === 'message' ? 'active' : ''}}"
+        bindtap="switchTab"
+        data-tab="message"
+      >
+        <text class="iconfont icon-message"></text>
+        <text class="menu-text">消息</text>
+      </view>
+
+      <view
+        class="menu-item {{currentTab === 'profile' ? 'active' : ''}}"
+        bindtap="switchTab"
+        data-tab="profile"
+      >
+        <text class="iconfont icon-user"></text>
+        <text class="menu-text">我的</text>
+      </view>
+    </view>
+
+    <!-- 抽屉底部 -->
+    <view class="drawer-footer">
+      <view class="logout-btn" bindtap="handleLogout">
+        <text class="iconfont icon-logout"></text>
+        <text class="logout-text">退出登录</text>
+      </view>
+    </view>
+  </view>
+</view>

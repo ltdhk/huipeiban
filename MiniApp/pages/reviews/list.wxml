@@ -1,0 +1,68 @@
+<view class="reviews-container">
+  <view wx:if="{{loading && reviews.length === 0}}" class="loading">加载中...</view>
+
+  <scroll-view wx:else class="reviews-list" scroll-y>
+    <view wx:if="{{reviews.length === 0}}" class="empty">
+      <text class="empty-text">暂无评价</text>
+      <text class="empty-hint">完成订单后可进行评价</text>
+    </view>
+
+    <view wx:else>
+      <view wx:for="{{reviews}}" wx:key="id" class="review-card">
+        <!-- 评价头部 -->
+        <view class="card-header">
+          <view class="rating-info">
+            <view class="stars">
+              <text wx:for="{{5}}" wx:key="index" class="star {{index < item.rating ? 'active' : ''}}">★</text>
+            </view>
+            <text class="rating-text">{{item.rating}}分</text>
+          </view>
+          <text class="delete-btn" data-id="{{item.id}}" bindtap="deleteReview">删除</text>
+        </view>
+
+        <!-- 评价内容 -->
+        <view class="card-content">
+          <text class="content">{{item.content}}</text>
+
+          <!-- 标签 -->
+          <view wx:if="{{item.tags && item.tags.length > 0}}" class="tags">
+            <text wx:for="{{item.tags}}" wx:key="index" class="tag">{{item}}</text>
+          </view>
+
+          <!-- 图片 -->
+          <view wx:if="{{item.images && item.images.length > 0}}" class="images">
+            <image
+              wx:for="{{item.images}}"
+              wx:key="index"
+              class="image"
+              src="{{item}}"
+              mode="aspectFill"
+            />
+          </view>
+
+          <!-- 订单信息 -->
+          <view class="order-info">
+            <text class="order-label">订单编号：</text>
+            <text class="order-value">{{item.order.order_no}}</text>
+          </view>
+
+          <!-- 时间 -->
+          <view class="time">
+            <text>{{item.created_at}}</text>
+          </view>
+        </view>
+
+        <!-- 商家回复 -->
+        <view wx:if="{{item.reply_content}}" class="reply">
+          <text class="reply-label">商家回复：</text>
+          <text class="reply-content">{{item.reply_content}}</text>
+          <text class="reply-time">{{item.reply_at}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view wx:if="{{loading && reviews.length > 0}}" class="loading-more">加载中...</view>
+    <view wx:if="{{!hasMore && reviews.length > 0}}" class="no-more">没有更多了</view>
+  </scroll-view>
+</view>

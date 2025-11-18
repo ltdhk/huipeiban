@@ -1,21 +1,51 @@
 <view class="messages-container">
-  <scroll-view class="message-list" scroll-y>
-    <view class="message-item" wx:for="{{messages}}" wx:key="id" data-id="{{item.id}}" bindtap="goToChat">
-      <image class="avatar" src="{{item.avatar}}" mode="aspectFill"></image>
+  <!-- 加载状态 -->
+  <view wx:if="{{loading && conversations.length === 0}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 会话列表 -->
+  <scroll-view wx:else class="message-list" scroll-y enable-back-to-top>
+    <view
+      class="message-item"
+      wx:for="{{conversations}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goToChat"
+    >
+      <image
+        class="avatar"
+        src="{{item.other_user_avatar || '/assets/default-avatar.png'}}"
+        mode="aspectFill"
+      ></image>
+
       <view class="message-content">
         <view class="message-header">
-          <text class="name">{{item.name}}</text>
-          <text class="time">{{item.time}}</text>
+          <text class="name">{{item.other_user_name || '未知用户'}}</text>
+          <text class="time">{{item.last_message_time}}</text>
         </view>
-        <text class="last-message">{{item.lastMessage}}</text>
+        <text class="last-message">{{item.last_message_content || '暂无消息'}}</text>
       </view>
-      <view class="badge" wx:if="{{item.unreadCount > 0}}">
-        <text class="badge-text">{{item.unreadCount}}</text>
+
+      <view class="badge" wx:if="{{item.unread_count > 0}}">
+        <text class="badge-text">{{item.unread_count}}</text>
       </view>
     </view>
 
-    <view class="empty" wx:if="{{messages.length === 0}}">
-      <text>暂无消息</text>
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{conversations.length === 0 && !loading}}">
+      <text class="empty-text">暂无会话</text>
+      <text class="empty-hint">开始与陪诊师或机构沟通吧</text>
+    </view>
+
+    <!-- 加载更多 -->
+    <view wx:if="{{loading && conversations.length > 0}}" class="loading-more">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 没有更多 -->
+    <view wx:if="{{!hasMore && conversations.length > 0}}" class="no-more">
+      <text>没有更多了</text>
     </view>
   </scroll-view>
 </view>

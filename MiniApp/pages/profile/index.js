@@ -1,12 +1,20 @@
 // MiniApp/pages/profile/index.js
+const { getUserProfile } = require('../../utils/api.js');
+
 Page({
   data: {
     userInfo: {
       id: null,
       nickname: '',
-      avatar: '/assets/default-avatar.png',
-      phone: ''
-    }
+      avatar_url: '/assets/default-avatar.png',
+      phone: '',
+      balance: 0,
+      points: 0,
+      member_level: 'normal',
+      total_orders: 0
+    },
+    loading: false,
+    unreadCount: 0
   },
 
   onLoad() {
@@ -14,19 +22,32 @@ Page({
   },
 
   async loadUserInfo() {
+    if (this.data.loading) return;
+
+    this.setData({ loading: true });
+
     try {
-      // TODO: 从本地存储或后端API获取用户信息
-      // 模拟数据
-      this.setData({
-        userInfo: {
-          id: 1,
-          nickname: '用户123',
-          avatar: '/assets/avatar1.jpg',
-          phone: '138****8888'
-        }
-      });
+      const res = await getUserProfile();
+
+      if (res.success && res.data) {
+        this.setData({
+          userInfo: res.data,
+          loading: false
+        });
+      } else {
+        throw new Error(res.message || '获取用户信息失败');
+      }
     } catch (error) {
       console.error('加载用户信息失败:', error);
+
+      this.setData({ loading: false });
+
+      // 如果未登录,跳转到登录页
+      if (error.message && error.message.includes('未登录')) {
+        wx.navigateTo({
+          url: '/pages/login/index'
+        });
+      }
     }
   },
 
@@ -43,7 +64,7 @@ Page({
   },
 
   goToOrders() {
-    wx.switchTab({
+    wx.navigateTo({
       url: '/pages/orders/list'
     });
   },

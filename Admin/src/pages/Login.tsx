@@ -17,12 +17,16 @@ export default function Login() {
     setLoading(true);
     try {
       const data = await login(values);
-      localStorage.setItem('token', data.token);
+      // 保存 token 和管理员信息
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('refresh_token', data.refresh_token);
       localStorage.setItem('admin', JSON.stringify(data.admin));
-      message.success('登录成功');
+      message.success('登录成功！');
+      // 跳转到首页
       navigate('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('登录失败:', error);
+      message.error(error.message || '登录失败，请重试');
     } finally {
       setLoading(false);
     }
@@ -68,6 +72,11 @@ export default function Login() {
             </Button>
           </Form.Item>
         </Form>
+
+        <div style={{ marginTop: '16px', textAlign: 'center', color: '#999' }}>
+          <p>默认账号：admin</p>
+          <p>默认密码：admin123</p>
+        </div>
       </Card>
     </div>
   );
