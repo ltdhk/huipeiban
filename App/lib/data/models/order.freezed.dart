@@ -72,7 +72,7 @@ mixin _$Order {
   String? get cancelReason => throw _privateConstructorUsedError;
   @JsonKey(name: 'cancelled_by')
   String? get cancelledBy => throw _privateConstructorUsedError;
-  @JsonKey(name: 'refund_amount', fromJson: _doubleFromJson)
+  @JsonKey(name: 'refund_amount', fromJson: _doubleFromJsonNullable)
   double? get refundAmount => throw _privateConstructorUsedError;
   @JsonKey(name: 'refund_status')
   String? get refundStatus => throw _privateConstructorUsedError;
@@ -130,7 +130,7 @@ abstract class $OrderCopyWith<$Res> {
       DateTime? cancelledAt,
       @JsonKey(name: 'cancel_reason') String? cancelReason,
       @JsonKey(name: 'cancelled_by') String? cancelledBy,
-      @JsonKey(name: 'refund_amount', fromJson: _doubleFromJson)
+      @JsonKey(name: 'refund_amount', fromJson: _doubleFromJsonNullable)
       double? refundAmount,
       @JsonKey(name: 'refund_status') String? refundStatus,
       @JsonKey(name: 'created_at', fromJson: _dateTimeFromJson)
@@ -396,7 +396,7 @@ abstract class _$$OrderImplCopyWith<$Res> implements $OrderCopyWith<$Res> {
       DateTime? cancelledAt,
       @JsonKey(name: 'cancel_reason') String? cancelReason,
       @JsonKey(name: 'cancelled_by') String? cancelledBy,
-      @JsonKey(name: 'refund_amount', fromJson: _doubleFromJson)
+      @JsonKey(name: 'refund_amount', fromJson: _doubleFromJsonNullable)
       double? refundAmount,
       @JsonKey(name: 'refund_status') String? refundStatus,
       @JsonKey(name: 'created_at', fromJson: _dateTimeFromJson)
@@ -634,7 +634,7 @@ class _$OrderImpl implements _Order {
       this.cancelledAt,
       @JsonKey(name: 'cancel_reason') this.cancelReason,
       @JsonKey(name: 'cancelled_by') this.cancelledBy,
-      @JsonKey(name: 'refund_amount', fromJson: _doubleFromJson)
+      @JsonKey(name: 'refund_amount', fromJson: _doubleFromJsonNullable)
       this.refundAmount,
       @JsonKey(name: 'refund_status') this.refundStatus,
       @JsonKey(name: 'created_at', fromJson: _dateTimeFromJson) this.createdAt,
@@ -726,7 +726,7 @@ class _$OrderImpl implements _Order {
   @JsonKey(name: 'cancelled_by')
   final String? cancelledBy;
   @override
-  @JsonKey(name: 'refund_amount', fromJson: _doubleFromJson)
+  @JsonKey(name: 'refund_amount', fromJson: _doubleFromJsonNullable)
   final double? refundAmount;
   @override
   @JsonKey(name: 'refund_status')
@@ -907,7 +907,7 @@ abstract class _Order implements Order {
       final DateTime? cancelledAt,
       @JsonKey(name: 'cancel_reason') final String? cancelReason,
       @JsonKey(name: 'cancelled_by') final String? cancelledBy,
-      @JsonKey(name: 'refund_amount', fromJson: _doubleFromJson)
+      @JsonKey(name: 'refund_amount', fromJson: _doubleFromJsonNullable)
       final double? refundAmount,
       @JsonKey(name: 'refund_status') final String? refundStatus,
       @JsonKey(name: 'created_at', fromJson: _dateTimeFromJson)
@@ -999,7 +999,7 @@ abstract class _Order implements Order {
   @JsonKey(name: 'cancelled_by')
   String? get cancelledBy;
   @override
-  @JsonKey(name: 'refund_amount', fromJson: _doubleFromJson)
+  @JsonKey(name: 'refund_amount', fromJson: _doubleFromJsonNullable)
   double? get refundAmount;
   @override
   @JsonKey(name: 'refund_status')

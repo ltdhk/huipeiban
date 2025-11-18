@@ -35,6 +35,7 @@ mixin _$Companion {
   bool get hasCar => throw _privateConstructorUsedError;
   @JsonKey(name: 'car_type')
   String? get carType => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _doubleFromJson)
   double get rating => throw _privateConstructorUsedError;
   @JsonKey(name: 'review_count')
   int get reviewCount => throw _privateConstructorUsedError;
@@ -80,7 +81,7 @@ abstract class $CompanionCopyWith<$Res> {
       String? introduction,
       @JsonKey(name: 'has_car') bool hasCar,
       @JsonKey(name: 'car_type') String? carType,
-      double rating,
+      @JsonKey(fromJson: _doubleFromJson) double rating,
       @JsonKey(name: 'review_count') int reviewCount,
       @JsonKey(name: 'total_orders') int totalOrders,
       @JsonKey(name: 'completed_orders') int completedOrders,
@@ -242,7 +243,7 @@ abstract class _$$CompanionImplCopyWith<$Res>
       String? introduction,
       @JsonKey(name: 'has_car') bool hasCar,
       @JsonKey(name: 'car_type') String? carType,
-      double rating,
+      @JsonKey(fromJson: _doubleFromJson) double rating,
       @JsonKey(name: 'review_count') int reviewCount,
       @JsonKey(name: 'total_orders') int totalOrders,
       @JsonKey(name: 'completed_orders') int completedOrders,
@@ -397,7 +398,7 @@ class _$CompanionImpl implements _Companion {
       this.introduction,
       @JsonKey(name: 'has_car') this.hasCar = false,
       @JsonKey(name: 'car_type') this.carType,
-      this.rating = 5.0,
+      @JsonKey(fromJson: _doubleFromJson) this.rating = 5.0,
       @JsonKey(name: 'review_count') this.reviewCount = 0,
       @JsonKey(name: 'total_orders') this.totalOrders = 0,
       @JsonKey(name: 'completed_orders') this.completedOrders = 0,
@@ -443,7 +444,7 @@ class _$CompanionImpl implements _Companion {
   @JsonKey(name: 'car_type')
   final String? carType;
   @override
-  @JsonKey()
+  @JsonKey(fromJson: _doubleFromJson)
   final double rating;
   @override
   @JsonKey(name: 'review_count')
@@ -614,7 +615,7 @@ abstract class _Companion implements Companion {
       final String? introduction,
       @JsonKey(name: 'has_car') final bool hasCar,
       @JsonKey(name: 'car_type') final String? carType,
-      final double rating,
+      @JsonKey(fromJson: _doubleFromJson) final double rating,
       @JsonKey(name: 'review_count') final int reviewCount,
       @JsonKey(name: 'total_orders') final int totalOrders,
       @JsonKey(name: 'completed_orders') final int completedOrders,
@@ -657,6 +658,7 @@ abstract class _Companion implements Companion {
   @JsonKey(name: 'car_type')
   String? get carType;
   @override
+  @JsonKey(fromJson: _doubleFromJson)
   double get rating;
   @override
   @JsonKey(name: 'review_count')

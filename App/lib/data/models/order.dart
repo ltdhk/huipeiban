@@ -36,7 +36,7 @@ class Order with _$Order {
     @JsonKey(name: 'cancelled_at', fromJson: _dateTimeFromJson) DateTime? cancelledAt,
     @JsonKey(name: 'cancel_reason') String? cancelReason,
     @JsonKey(name: 'cancelled_by') String? cancelledBy,
-    @JsonKey(name: 'refund_amount', fromJson: _doubleFromJson) double? refundAmount,
+    @JsonKey(name: 'refund_amount', fromJson: _doubleFromJsonNullable) double? refundAmount,
     @JsonKey(name: 'refund_status') String? refundStatus,
     @JsonKey(name: 'created_at', fromJson: _dateTimeFromJson) DateTime? createdAt,
     @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson) DateTime? updatedAt,
@@ -85,6 +85,19 @@ double _doubleFromJson(dynamic value) {
     }
   }
   return 0.0;
+}
+
+double? _doubleFromJsonNullable(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toDouble();
+  if (value is String) {
+    try {
+      return double.parse(value);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
 }
 
 /// 创建订单请求

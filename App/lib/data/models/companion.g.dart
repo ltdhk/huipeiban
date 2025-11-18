@@ -18,7 +18,7 @@ _$CompanionImpl _$$CompanionImplFromJson(Map<String, dynamic> json) =>
       introduction: json['introduction'] as String?,
       hasCar: json['has_car'] as bool? ?? false,
       carType: json['car_type'] as String?,
-      rating: (json['rating'] as num?)?.toDouble() ?? 5.0,
+      rating: json['rating'] == null ? 5.0 : _doubleFromJson(json['rating']),
       reviewCount: (json['review_count'] as num?)?.toInt() ?? 0,
       totalOrders: (json['total_orders'] as num?)?.toInt() ?? 0,
       completedOrders: (json['completed_orders'] as num?)?.toInt() ?? 0,

@@ -17,7 +17,7 @@ class Companion with _$Companion {
     String? introduction,
     @JsonKey(name: 'has_car') @Default(false) bool hasCar,
     @JsonKey(name: 'car_type') String? carType,
-    @Default(5.0) double rating,
+    @JsonKey(fromJson: _doubleFromJson) @Default(5.0) double rating,
     @JsonKey(name: 'review_count') @Default(0) int reviewCount,
     @JsonKey(name: 'total_orders') @Default(0) int totalOrders,
     @JsonKey(name: 'completed_orders') @Default(0) int completedOrders,
@@ -33,6 +33,20 @@ class Companion with _$Companion {
 
   factory Companion.fromJson(Map<String, dynamic> json) =>
       _$CompanionFromJson(json);
+}
+
+// 自定义 JSON 转换函数
+double _doubleFromJson(dynamic value) {
+  if (value == null) return 5.0;
+  if (value is num) return value.toDouble();
+  if (value is String) {
+    try {
+      return double.parse(value);
+    } catch (e) {
+      return 5.0;
+    }
+  }
+  return 5.0;
 }
 
 /// 陪诊师推荐响应 (从 AI 返回)

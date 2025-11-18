@@ -42,7 +42,7 @@ _$OrderImpl _$$OrderImplFromJson(Map<String, dynamic> json) => _$OrderImpl(
       cancelledAt: _dateTimeFromJson(json['cancelled_at']),
       cancelReason: json['cancel_reason'] as String?,
       cancelledBy: json['cancelled_by'] as String?,
-      refundAmount: _doubleFromJson(json['refund_amount']),
+      refundAmount: _doubleFromJsonNullable(json['refund_amount']),
       refundStatus: json['refund_status'] as String?,
       createdAt: _dateTimeFromJson(json['created_at']),
       updatedAt: _dateTimeFromJson(json['updated_at']),
