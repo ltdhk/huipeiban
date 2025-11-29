@@ -10,10 +10,19 @@ Page({
     loading: false,
     sending: false,
     page: 1,
-    hasMore: true
+    hasMore: true,
+    // 语音识别相关
+    isRecording: false,
+    recognizedText: ''
   },
 
+  // 语音识别管理器
+  recognizeManager: null,
+
   onLoad(options) {
+    // 初始化语音识别管理器
+    this.initRecognizeManager();
+
     if (options.conversationId) {
       this.setData({ conversationId: options.conversationId });
       this.loadMessages();
@@ -27,6 +36,64 @@ Page({
         wx.navigateBack();
       }, 1500);
     }
+  },
+
+  /**
+   * 初始化语音识别管理器
+   */
+  initRecognizeManager() {
+    this.recognizeManager = wx.createRecognizeManager({
+      lang: 'zh_CN' // 识别语言:中文
+    });
+
+    // 实时识别结果回调
+    this.recognizeManager.onRecognize((res) => {
+      console.log('实时识别结果:', res.result);
+      this.setData({
+        recognizedText: res.result
+      });
+    });
+
+    // 识别结束回调
+    this.recognizeManager.onStop((res) => {
+      console.log('识别结束:', res.result);
+      const finalText = res.result;
+
+      this.setData({
+        isRecording: false,
+        recognizedText: ''
+      });
+
+      // 如果识别到文字,填充到输入框
+      if (finalText && finalText.trim()) {
+        this.setData({
+          inputText: finalText.trim()
+        });
+      }
+    });
+
+    // 识别错误回调
+    this.recognizeManager.onError((res) => {
+      console.error('识别错误:', res);
+      this.setData({
+        isRecording: false,
+        recognizedText: ''
+      });
+
+      wx.showToast({
+        title: '识别失败,请重试',
+        icon: 'none'
+      });
+    });
+
+    // 识别开始回调
+    this.recognizeManager.onStart(() => {
+      console.log('开始识别');
+      this.setData({
+        isRecording: true,
+        recognizedText: ''
+      });
+    });
   },
 
   /**
@@ -164,5 +231,52 @@ Page({
     setTimeout(() => {
       this.setData({ scrollIntoView: 'bottom' });
     }, 100);
+  },
+
+  /**
+   * 长按开始语音识别
+   */
+  onVoiceStart() {
+    console.log('开始语音识别');
+    try {
+      this.recognizeManager.start({
+        duration: 60000 // 最长60秒
+      });
+    } catch (error) {
+      console.error('启动语音识别失败:', error);
+      wx.showToast({
+        title: '启动失败',
+        icon: 'none'
+      });
+    }
+  },
+
+  /**
+   * 松开停止语音识别
+   */
+  onVoiceEnd() {
+    console.log('停止语音识别');
+    try {
+      this.recognizeManager.stop();
+    } catch (error) {
+      console.error('停止语音识别失败:', error);
+    }
+  },
+
+  /**
+   * 上滑取消语音识别
+   */
+  onVoiceCancel() {
+    console.log('取消语音识别');
+    try {
+      this.recognizeManager.stop();
+      this.setData({
+        isRecording: false,
+        recognizedText: '',
+        inputText: '' // 清空输入框
+      });
+    } catch (error) {
+      console.error('取消语音识别失败:', error);
+    }
   }
 });

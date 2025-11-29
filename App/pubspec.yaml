@@ -51,6 +51,10 @@ dependencies:
   geolocator: ^11.0.0
   geocoding: ^3.0.0
 
+  # 语音输入
+  speech_to_text: ^6.6.0
+  permission_handler: ^11.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

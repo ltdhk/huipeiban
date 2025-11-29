@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:async';
 import '../../../app/theme.dart';
 import '../../../data/models/ai_chat.dart';
 import '../../../data/models/companion.dart';
@@ -10,6 +11,7 @@ import '../../controllers/ai_chat_controller.dart';
 import '../orders/create_order_page.dart';
 import '../orders/order_detail_page.dart';
 import '../../widgets/order_card_message.dart';
+import '../../widgets/voice_input_widget.dart';
 
 /// 主页 - AI 聊天界面
 class HomePage extends ConsumerStatefulWidget {
@@ -28,6 +30,12 @@ class _HomePageState extends ConsumerState<HomePage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  // 语音识别相关状态
+  bool _isCancelling = false;
+  double _dragOffset = 0;
+  Timer? _durationTimer;
+  int _recordingSeconds = 0;
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +45,71 @@ class _HomePageState extends ConsumerState<HomePage> {
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
+    _durationTimer?.cancel();
     super.dispose();
+  }
+
+  // 语音输入方法
+  void _startVoiceInput() {
+    setState(() {
+      _isCancelling = false;
+      _dragOffset = 0;
+      _recordingSeconds = 0;
+    });
+
+    // 开始计时
+    _durationTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _recordingSeconds++;
+      });
+
+      // 60秒自动停止
+      if (_recordingSeconds >= 60) {
+        _stopVoiceInput();
+      }
+    });
+
+    ref.read(aiChatControllerProvider.notifier).startVoiceInput();
+  }
+
+  void _stopVoiceInput() {
+    _durationTimer?.cancel();
+    ref.read(aiChatControllerProvider.notifier).stopVoiceInput();
+
+    setState(() {
+      _isCancelling = false;
+      _dragOffset = 0;
+      _recordingSeconds = 0;
+    });
+
+    // 延迟滚动，等待消息添加到列表
+    Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+  }
+
+  void _cancelVoiceInput() {
+    _durationTimer?.cancel();
+    ref.read(aiChatControllerProvider.notifier).cancelVoiceInput();
+
+    setState(() {
+      _isCancelling = false;
+      _dragOffset = 0;
+      _recordingSeconds = 0;
+    });
+  }
+
+  void _onVerticalDragUpdate(double offset) {
+    setState(() {
+      _dragOffset = offset;
+
+      // 上滑超过 80 像素进入取消状态
+      if (_dragOffset < -80) {
+        _isCancelling = true;
+        ref.read(aiChatControllerProvider.notifier).setVoiceCancelling(true);
+      } else {
+        _isCancelling = false;
+        ref.read(aiChatControllerProvider.notifier).setVoiceCancelling(false);
+      }
+    });
   }
 
   void _scrollToBottom() {
@@ -608,68 +680,97 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   /// 构建输入区域
   Widget _buildInputArea() {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 16.w,
-        vertical: 12.h,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+    final controller = ref.watch(aiChatControllerProvider.notifier);
+    final isListening = controller.isListening;
+    final recognizedText = controller.recognizedText;
+
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 12.h,
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _messageController,
-                decoration: InputDecoration(
-                  hintText: '输入消息...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24.r),
-                    borderSide: BorderSide(color: AppTheme.dividerColor),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(
+                      hintText: '输入消息...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.r),
+                        borderSide: BorderSide(color: AppTheme.dividerColor),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.r),
+                        borderSide: BorderSide(color: AppTheme.dividerColor),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.r),
+                        borderSide: BorderSide(color: AppTheme.primaryColor),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 12.h,
+                      ),
+                      filled: true,
+                      fillColor: AppTheme.backgroundColor,
+                    ),
+                    maxLines: null,
+                    textInputAction: TextInputAction.send,
+                    onSubmitted: (_) => _sendMessage(),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24.r),
-                    borderSide: BorderSide(color: AppTheme.dividerColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24.r),
-                    borderSide: BorderSide(color: AppTheme.primaryColor),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 12.h,
-                  ),
-                  filled: true,
-                  fillColor: AppTheme.backgroundColor,
                 ),
-                maxLines: null,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _sendMessage(),
-              ),
+                SizedBox(width: 8.w),
+
+                // 语音输入按钮
+                VoiceInputWidget(
+                  onStart: _startVoiceInput,
+                  onStop: _stopVoiceInput,
+                  onCancel: _cancelVoiceInput,
+                  isListening: isListening,
+                  recognizedText: recognizedText,
+                ),
+
+                SizedBox(width: 8.w),
+
+                // 发送按钮
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.primaryGradient,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.send),
+                    color: Colors.white,
+                    onPressed: _sendMessage,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 12.w),
-            Container(
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.send),
-                color: Colors.white,
-                onPressed: _sendMessage,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+
+        // 语音识别覆盖层
+        VoiceRecordingOverlay(
+          isListening: isListening,
+          isCancelling: _isCancelling,
+          recordingSeconds: _recordingSeconds,
+          recognizedText: recognizedText,
+        ),
+      ],
     );
   }
 }

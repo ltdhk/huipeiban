@@ -171,3 +171,105 @@
   background: #e0e0e0;
   color: #ccc;
 }
+
+/* 语音输入按钮 */
+.voice-btn {
+  width: 72rpx;
+  height: 72rpx;
+  margin-left: 16rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(102, 126, 234, 0.3);
+}
+
+.voice-btn.recording {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2rpx 8rpx rgba(245, 87, 108, 0.3);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 4rpx 16rpx rgba(245, 87, 108, 0.5);
+  }
+}
+
+.voice-btn .iconfont {
+  font-size: 40rpx;
+  color: #ffffff;
+}
+
+/* 语音识别蒙层 */
+.voice-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-in;
+}
+
+.voice-modal {
+  width: 560rpx;
+  padding: 48rpx;
+  background: #ffffff;
+  border-radius: 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.voice-icon {
+  width: 160rpx;
+  height: 160rpx;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.voice-icon .iconfont {
+  font-size: 80rpx;
+  color: #ffffff;
+}
+
+.voice-text {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.recognized-text {
+  max-width: 100%;
+  padding: 24rpx;
+  background: #f5f5f5;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+  word-wrap: break-word;
+  line-height: 1.6;
+}
+
+.voice-hint {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
