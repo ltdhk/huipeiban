@@ -17,7 +17,7 @@ langchain-openai==0.0.2
 openai==1.6.1
 
 # 微信支付
-wechatpayv3==1.2.6
+#wechatpayv3==1.2.6
 
 # 工具库
 python-dotenv==1.0.0

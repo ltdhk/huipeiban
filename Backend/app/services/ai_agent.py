@@ -8,8 +8,9 @@ import uuid
 import re
 from datetime import datetime
 from typing import List, Dict, Optional, Tuple, Any
+
+import requests
 from flask import current_app
-from openai import OpenAI
 
 from app.extensions import db
 from app.models.ai import AIChatHistory
@@ -26,7 +27,10 @@ class AIAgent:
         self.api_key = None
         self.model = None
         self.base_url = None
-        self.client = None
+        self.chat_endpoint = None
+        self.session: Optional[requests.Session] = None
+        self.site_url: Optional[str] = None
+        self.site_title: Optional[str] = None
         self.tools = None
 
     def _ensure_initialized(self):
@@ -36,13 +40,37 @@ class AIAgent:
 
         self.api_key = current_app.config.get('OPENROUTER_API_KEY')
         self.model = current_app.config.get('OPENROUTER_MODEL')
-        self.base_url = current_app.config.get('OPENROUTER_BASE_URL')
+        self.base_url = (current_app.config.get('OPENROUTER_BASE_URL') or '').rstrip('/')
+        self.site_url = current_app.config.get('OPENROUTER_SITE_URL') or os.getenv('OPENROUTER_SITE_URL')
+        self.site_title = current_app.config.get('OPENROUTER_SITE_TITLE') or \
+            os.getenv('OPENROUTER_SITE_TITLE', 'CareLink AI Assistant')
+        
+        current_app.logger.info(f"OpenRouter key prefix: {self.api_key[:8]}***")
 
-        # 初始化 OpenAI 客户端（兼容 OpenRouter）
-        self.client = OpenAI(
-            api_key=self.api_key,
-            base_url=self.base_url
-        )
+        if not self.api_key:
+            raise RuntimeError('OpenRouter API key 未配置')
+        if not self.model:
+            raise RuntimeError('OpenRouter 模型未配置')
+        if not self.base_url:
+            raise RuntimeError('OpenRouter Base URL 未配置')
+
+        self.chat_endpoint = f'{self.base_url}/chat/completions'
+
+        # 初始化 HTTP 会话，避免底层 OpenAI 客户端触发 proxies 参数错误
+        self.session = requests.Session()
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'CareLinkBackend/1.0',
+            'X-Title': self.site_title
+        }
+        if self.site_url:
+            headers['HTTP-Referer'] = self.site_url
+            headers['Referer'] = self.site_url
+        else:
+            current_app.logger.warning('OpenRouter Referer 未配置，建议在 .env 中设置 OPENROUTER_SITE_URL')
+        self.session.headers.update(headers)
 
         # 定义可用的工具（Function Calling）
         self.tools = self._define_tools()
@@ -148,6 +176,84 @@ class AIAgent:
             }
         ]
 
+    def _create_completion(
+        self,
+        messages: List[Dict],
+        tools: Optional[List[Dict]] = None,
+        tool_choice: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: int = 2000
+    ) -> Dict:
+        """调用 OpenRouter Chat Completions 接口"""
+        payload: Dict[str, Any] = {
+            'model': self.model,
+            'messages': messages,
+            'temperature': temperature,
+            'max_tokens': max_tokens
+        }
+
+        if tools:
+            payload['tools'] = tools
+            if tool_choice:
+                payload['tool_choice'] = tool_choice
+
+        return self._post_to_openrouter(payload)
+
+    def _post_to_openrouter(self, payload: Dict[str, Any]) -> Dict:
+        """发送请求到 OpenRouter"""
+        if not self.session or not self.chat_endpoint:
+            raise RuntimeError('AI Agent 尚未初始化')
+
+        try:
+            response = self.session.post(self.chat_endpoint, json=payload, timeout=60)
+            response.raise_for_status()
+            return response.json()
+        except requests.HTTPError as exc:
+            resp = exc.response
+            status = resp.status_code if resp is not None else 'unknown'
+            body = ''
+            if resp is not None:
+                try:
+                    body = resp.text
+                except Exception:
+                    body = '<body 读取失败>'
+            current_app.logger.error(
+                f'调用 OpenRouter 失败，状态码 {status}，响应: {body}'
+            )
+            raise RuntimeError(f'OpenRouter API 调用失败: HTTP {status}')
+        except requests.RequestException as exc:
+            current_app.logger.error(f'调用 OpenRouter 失败: {exc}')
+            raise RuntimeError('OpenRouter API 请求异常，请检查网络连接')
+
+    def _extract_message_content(self, message: Dict) -> str:
+        """兼容不同响应格式的内容解析"""
+        if not message:
+            return ""
+
+        content = message.get('content')
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts = []
+            for item in content:
+                if isinstance(item, dict):
+                    parts.append(item.get('text') or item.get('content') or '')
+                else:
+                    parts.append(str(item))
+            return ''.join(parts)
+        return content or ""
+
+    def _parse_tool_arguments(self, arguments: Any) -> Dict:
+        """解析工具调用参数"""
+        if isinstance(arguments, dict):
+            return arguments
+        if isinstance(arguments, str) and arguments.strip():
+            try:
+                return json.loads(arguments)
+            except json.JSONDecodeError:
+                current_app.logger.warning(f'解析工具参数失败: {arguments}')
+        return {}
+
     def chat(self, user_id: int, message: str, session_id: Optional[str] = None) -> Dict:
         """
         处理用户消息并返回AI响应
@@ -195,8 +301,7 @@ class AIAgent:
             current_app.logger.info('=' * 60)
 
             # 调用 OpenRouter API（支持 Function Calling）
-            response = self.client.chat.completions.create(
-                model=self.model,
+            response = self._create_completion(
                 messages=messages,
                 tools=self.tools,
                 tool_choice="auto",  # 让模型自动决定是否调用工具
@@ -204,17 +309,25 @@ class AIAgent:
                 max_tokens=2000
             )
 
+            choices = response.get('choices', [])
+            if not choices:
+                raise RuntimeError('OpenRouter 未返回任何响应')
+
             # 处理响应
-            assistant_message_obj = response.choices[0].message
-            assistant_content = assistant_message_obj.content or ""
-            tokens_used = response.usage.total_tokens if response.usage else 0
+            assistant_message_obj = choices[0].get('message', {})
+            assistant_content = self._extract_message_content(assistant_message_obj)
+            usage = response.get('usage') or {}
+            tokens_used = usage.get('total_tokens', 0)
 
             # 记录 AI 响应详情
             current_app.logger.info('=' * 60)
             current_app.logger.info('收到 AI 响应')
             current_app.logger.info(f'响应内容: {assistant_content[:100]}...')
             current_app.logger.info(f'响应对象类型: {type(assistant_message_obj)}')
-            current_app.logger.info(f'响应对象属性: {dir(assistant_message_obj)}')
+            if isinstance(assistant_message_obj, dict):
+                current_app.logger.info(f'响应对象字段: {list(assistant_message_obj.keys())}')
+            else:
+                current_app.logger.info(f'响应对象数据: {assistant_message_obj}')
 
             # 初始化意图、实体和推荐
             intent = None
@@ -222,7 +335,7 @@ class AIAgent:
             recommendations = []
 
             # 检查是否有工具调用
-            tool_calls = assistant_message_obj.tool_calls
+            tool_calls = assistant_message_obj.get('tool_calls') or []
             current_app.logger.info(f'工具调用 (tool_calls): {tool_calls}')
             current_app.logger.info(f'工具调用类型: {type(tool_calls)}')
             current_app.logger.info('=' * 60)
@@ -231,8 +344,10 @@ class AIAgent:
                 current_app.logger.info(f'检测到 {len(tool_calls)} 个工具调用')
                 # 处理工具调用
                 for tool_call in tool_calls:
-                    function_name = tool_call.function.name
-                    function_args = json.loads(tool_call.function.arguments)
+                    function_name = tool_call.get('function', {}).get('name')
+                    function_args = self._parse_tool_arguments(
+                        tool_call.get('function', {}).get('arguments')
+                    )
 
                     # 执行工具并获取结果
                     tool_result = self._execute_tool(function_name, function_args)
@@ -276,11 +391,11 @@ class AIAgent:
                     "content": assistant_content,
                     "tool_calls": [
                         {
-                            "id": tc.id,
+                            "id": tc.get('id'),
                             "type": "function",
                             "function": {
-                                "name": tc.function.name,
-                                "arguments": tc.function.arguments
+                                "name": tc.get('function', {}).get('name'),
+                                "arguments": tc.get('function', {}).get('arguments')
                             }
                         }
                         for tc in tool_calls
@@ -289,26 +404,32 @@ class AIAgent:
 
                 # 添加工具响应
                 for tool_call in tool_calls:
-                    function_name = tool_call.function.name
-                    function_args = json.loads(tool_call.function.arguments)
+                    function_name = tool_call.get('function', {}).get('name')
+                    function_args = self._parse_tool_arguments(
+                        tool_call.get('function', {}).get('arguments')
+                    )
                     tool_result = self._execute_tool(function_name, function_args)
 
                     messages.append({
                         "role": "tool",
-                        "tool_call_id": tool_call.id,
+                        "tool_call_id": tool_call.get('id'),
                         "content": json.dumps(tool_result, ensure_ascii=False)
                     })
 
                 # 再次调用 API 生成最终回复
-                final_response = self.client.chat.completions.create(
-                    model=self.model,
+                final_response = self._create_completion(
                     messages=messages,
                     temperature=0.7,
                     max_tokens=2000
                 )
 
-                assistant_content = final_response.choices[0].message.content
-                tokens_used += final_response.usage.total_tokens if final_response.usage else 0
+                final_choices = final_response.get('choices', [])
+                if not final_choices:
+                    raise RuntimeError('OpenRouter 未返回最终回复')
+
+                assistant_content = self._extract_message_content(final_choices[0].get('message', {}))
+                final_usage = final_response.get('usage') or {}
+                tokens_used += final_usage.get('total_tokens', 0)
             else:
                 # 没有工具调用，使用原有的意图识别方法
                 intent, entities = self._extract_intent_and_entities(assistant_content, message)

@@ -38,6 +38,29 @@ class DioClient {
   /// 获取 Dio 实例
   Dio get dio => _dio;
 
+  /// 创建指向 IM 服务的 Dio 实例（复用相同拦截器）
+  Dio createImDio() {
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: ApiConstants.imApiBasePath,
+        connectTimeout: const Duration(milliseconds: ApiConstants.connectTimeout),
+        receiveTimeout: const Duration(milliseconds: ApiConstants.receiveTimeout),
+        sendTimeout: const Duration(milliseconds: ApiConstants.sendTimeout),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
+
+    dio.interceptors.addAll([
+      AuthInterceptor(),
+      LoggerInterceptor(),
+      ErrorInterceptor(),
+    ]);
+    return dio;
+  }
+
   /// GET 请求
   Future<Response<T>> get<T>(
     String path, {

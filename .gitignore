@@ -76,3 +76,7 @@ htmlcov/
 .cache/
 tmp/
 temp/
+
+# Flutter generated
+App/.flutter-plugins
+App/.flutter-plugins-dependencies

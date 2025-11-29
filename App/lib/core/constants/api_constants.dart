@@ -7,13 +7,16 @@ class ApiConstants {
   /// iOS 模拟器: localhost 或 127.0.0.1
   /// 真机/其他设备: 192.168.3.138 (您的局域网IP)
   /// 虚拟机内部: 127.0.0.1 或 198.18.0.1
-  static const String baseUrl = 'http://10.0.2.2:5000';
+  static const String baseUrl = 'http://172.20.10.6:5001';
+  static const String imBaseUrl = 'http://172.20.10.6:6001';
+  static const String imWsUrl = 'ws://172.20.10.6:6001/ws';
 
   /// API 版本
   static const String apiVersion = '/api/v1';
 
   /// API 基础路径
   static const String apiBasePath = '$baseUrl$apiVersion';
+  static const String imApiBasePath = '$imBaseUrl$apiVersion';
 
   // ==================== 认证相关 ====================
   /// 微信登录
@@ -80,13 +83,16 @@ class ApiConstants {
   static const String conversations = '/user/messages/conversations';
 
   /// 会话详情
-  static String conversationDetail(int id) => '/user/messages/conversations/$id';
+  static String conversationDetail(int id) =>
+      '/user/messages/conversations/$id';
 
   /// 发送消息
-  static String sendMessage(int id) => '/user/messages/conversations/$id/messages';
+  static String sendMessage(int id) =>
+      '/user/messages/conversations/$id/messages';
 
   /// 删除会话
-  static String deleteConversation(int id) => '/user/messages/conversations/$id';
+  static String deleteConversation(int id) =>
+      '/user/messages/conversations/$id';
 
   /// 未读消息数
   static const String unreadCount = '/user/messages/unread-count';
