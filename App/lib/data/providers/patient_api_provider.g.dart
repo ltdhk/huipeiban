@@ -14,7 +14,7 @@ class _PatientApiProvider implements PatientApiProvider {
     this.baseUrl,
     this.errorLogger,
   }) {
-    baseUrl ??= 'http://127.0.0.1:5001/api/v1';
+    baseUrl ??= 'http://172.20.10.6:5001/api/v1';
   }
 
   final Dio _dio;
