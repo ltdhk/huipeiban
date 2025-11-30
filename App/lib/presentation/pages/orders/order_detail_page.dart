@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../app/theme.dart';
 import '../../../data/models/order.dart';
 import '../../../data/repositories/order_repository.dart';
+import '../../../data/repositories/message_repository.dart';
+import '../messages/chat_detail_page.dart';
 
 /// 订单详情页面
 class OrderDetailPage extends StatefulWidget {
@@ -19,7 +21,66 @@ class OrderDetailPage extends StatefulWidget {
 
 class _OrderDetailPageState extends State<OrderDetailPage> {
   final OrderRepository _orderRepository = OrderRepository();
+  final MessageRepository _messageRepository = MessageRepository();
   bool _isCancelling = false;
+  bool _isCreatingConversation = false;
+
+  /// 获取联系按钮文本
+  String _getContactButtonText() {
+    if (widget.order.orderType == 'institution') {
+      return '联系机构';
+    }
+    return '联系陪诊师';
+  }
+
+  /// 联系服务提供方（陪诊师或机构）
+  Future<void> _contactServiceProvider() async {
+    if (_isCreatingConversation) return;
+
+    setState(() => _isCreatingConversation = true);
+
+    try {
+      // 获取服务提供方的用户ID
+      // 注意：需要使用 companion.userId，而不是 order.companionId
+      // companion.userId 是关联到 users 表的 ID，用于即时通讯
+      // order.companionId 是 companions 表的主键 ID
+      int? targetUserId;
+      if (widget.order.orderType == 'companion') {
+        targetUserId = widget.order.companion?.userId;
+      } else {
+        // 机构使用 institution.userId 进行即时通讯
+        targetUserId = widget.order.institution?.userId;
+      }
+
+      if (targetUserId == null) {
+        throw Exception('无法获取服务提供方信息');
+      }
+
+      // 调用API创建或获取已存在的会话
+      final conversation = await _messageRepository.createConversation(
+        targetUserId: targetUserId,
+      );
+
+      if (!mounted) return;
+
+      // 跳转到聊天详情页
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatDetailPage(conversation: conversation),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('创建会话失败: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isCreatingConversation = false);
+      }
+    }
+  }
 
   /// 取消订单
   Future<void> _cancelOrder() async {
@@ -613,9 +674,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               SizedBox(width: 12.w),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: 去支付
-                  },
+                  onPressed: _contactServiceProvider,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryColor,
                     padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -624,7 +683,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     ),
                   ),
                   child: Text(
-                    '去支付',
+                    _getContactButtonText(),
                     style: TextStyle(
                       fontSize: 15.sp,
                       fontWeight: FontWeight.w600,
@@ -684,43 +743,45 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               ),
               SizedBox(width: 12.w),
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    // TODO: 联系客服
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.primaryColor,
-                    side: BorderSide(color: AppTheme.primaryColor),
+                child: ElevatedButton(
+                  onPressed: _contactServiceProvider,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
                     padding: EdgeInsets.symmetric(vertical: 14.h),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24.r),
                     ),
                   ),
                   child: Text(
-                    '联系客服',
-                    style: TextStyle(fontSize: 15.sp),
+                    _getContactButtonText(),
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
             ] else if (widget.order.status != 'cancelled' &&
                        widget.order.status != 'completed') ...[
-              // 其他状态只显示联系客服
+              // 其他状态只显示联系陪诊师/机构
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    // TODO: 联系客服
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.primaryColor,
-                    side: BorderSide(color: AppTheme.primaryColor),
+                child: ElevatedButton(
+                  onPressed: _contactServiceProvider,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
                     padding: EdgeInsets.symmetric(vertical: 14.h),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24.r),
                     ),
                   ),
                   child: Text(
-                    '联系客服',
-                    style: TextStyle(fontSize: 15.sp),
+                    _getContactButtonText(),
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -790,7 +851,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   IconData _getStatusIcon(String status) {
     switch (status) {
       case 'pending_payment':
-        return Icons.payment_outlined;
+        return Icons.check_circle_outline;
       case 'pending_accept':
         return Icons.schedule_outlined;
       case 'pending_service':
@@ -810,7 +871,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   String _getStatusDescription(String status) {
     switch (status) {
       case 'pending_payment':
-        return '请尽快完成支付';
+        return '预约成功，请联系陪诊师确认服务详情';
       case 'pending_accept':
         return '陪诊师将尽快接单';
       case 'pending_service':

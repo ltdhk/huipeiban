@@ -9,9 +9,39 @@ from app.api.user import user_bp
 from app.utils.response import success_response, error_response
 from app.utils.jwt_utils import generate_tokens, get_current_user_id
 from app.models.user import User
+from app.models.companion import Companion, Institution
 from app.extensions import db
 from datetime import datetime
 import requests
+
+
+def _get_role_data(user):
+    """
+    根据用户类型获取关联的角色数据
+
+    Args:
+        user: User 对象
+
+    Returns:
+        dict: 包含角色相关信息的字典,如果用户不是陪诊师或机构则返回 None
+    """
+    if user.user_type == 'companion':
+        # 查找陪诊师信息
+        companion = Companion.query.filter_by(user_id=user.id, is_deleted=False).first()
+        if companion:
+            return {
+                'companion_id': companion.id,
+                'companion_info': companion.to_dict(include_sensitive=True)
+            }
+    elif user.user_type == 'institution':
+        # 查找机构信息
+        institution = Institution.query.filter_by(user_id=user.id, is_deleted=False).first()
+        if institution:
+            return {
+                'institution_id': institution.id,
+                'institution_info': institution.to_dict()
+            }
+    return None
 
 
 @user_bp.route('/auth/login', methods=['POST'])
@@ -48,12 +78,18 @@ def phone_login():
         user.last_login_at = datetime.utcnow()
         db.session.commit()
 
-        # 生成 token
-        tokens = generate_tokens(user.id)
+        # 生成 token，传递用户类型
+        tokens = generate_tokens(user.id, user_type=user.user_type or 'user')
+
+        # 根据用户类型获取关联信息
+        user_data = user.to_dict()
+        role_data = _get_role_data(user)
+        if role_data:
+            user_data.update(role_data)
 
         return success_response({
             **tokens,
-            'user': user.to_dict()
+            'user': user_data
         }, message='登录成功')
 
     except Exception as e:
@@ -194,10 +230,10 @@ def refresh_token():
     if user.status != 'active':
         return error_response(403, 'USER_DISABLED', '用户已被禁用')
 
-    # 生成新的 tokens
+    # 生成新的 tokens，保留用户类型
     tokens = generate_tokens(
         identity=current_user_id,
-        user_type='user'
+        user_type=user.user_type or 'user'
     )
 
     return success_response({
@@ -220,8 +256,14 @@ def get_current_user():
     if not user:
         return error_response(404, 'USER_NOT_FOUND', '用户不存在')
 
+    # 根据用户类型获取关联信息
+    user_data = user.to_dict()
+    role_data = _get_role_data(user)
+    if role_data:
+        user_data.update(role_data)
+
     return success_response({
-        'user': user.to_dict()
+        'user': user_data
     })
 
 

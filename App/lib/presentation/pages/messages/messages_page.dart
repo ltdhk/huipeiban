@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:characters/characters.dart';
 import '../../../app/theme.dart';
 import '../../../data/models/message.dart';
 import '../../controllers/chat_controller.dart';
@@ -47,7 +46,7 @@ class MessagesPage extends ConsumerWidget {
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               itemBuilder: (context, index) {
                 final conv = list[index];
-                final title = conv.otherParty?.name ?? conv.title ?? '会话';
+                final title = conv.otherParty?.nickname ?? '会话';
                 final subtitle = conv.lastMessage ?? '暂无消息';
                 return ListTile(
                   leading: CircleAvatar(

@@ -7,9 +7,9 @@ class ApiConstants {
   /// iOS 模拟器: localhost 或 127.0.0.1
   /// 真机/其他设备: 192.168.3.138 (您的局域网IP)
   /// 虚拟机内部: 127.0.0.1 或 198.18.0.1
-  static const String baseUrl = 'http://172.20.10.6:5001';
-  static const String imBaseUrl = 'http://172.20.10.6:6001';
-  static const String imWsUrl = 'ws://172.20.10.6:6001/ws';
+  static const String baseUrl = 'http://198.18.0.1:5001';
+  static const String imBaseUrl = 'http://198.18.0.1:6001';
+  static const String imWsUrl = 'ws://198.18.0.1:6001/ws';
 
   /// API 版本
   static const String apiVersion = '/api/v1';
@@ -116,6 +116,38 @@ class ApiConstants {
 
   /// 陪诊师评价列表
   static String companionReviews(int id) => '/user/companions/$id/reviews';
+
+  // ==================== 陪诊师订单管理 ====================
+  /// 陪诊师订单列表
+  static const String companionOrders = '/companion/orders';
+
+  /// 陪诊师订单详情
+  static String companionOrderDetail(int id) => '/companion/orders/$id';
+
+  /// 陪诊师接单
+  static String companionAcceptOrder(int id) => '/companion/orders/$id/accept';
+
+  /// 陪诊师拒绝订单
+  static String companionRejectOrder(int id) => '/companion/orders/$id/reject';
+
+  /// 陪诊师开始服务
+  static String companionStartService(int id) => '/companion/orders/$id/start';
+
+  /// 陪诊师完成服务
+  static String companionCompleteService(int id) => '/companion/orders/$id/complete';
+
+  /// 陪诊师订单统计
+  static const String companionOrderStats = '/companion/orders/stats';
+
+  // ==================== 服务管理 ====================
+  /// 服务列表
+  static const String services = '/user/services';
+
+  /// 服务详情
+  static String serviceDetail(int id) => '/user/services/$id';
+
+  /// 切换服务状态
+  static String toggleService(int id) => '/user/services/$id/toggle';
 
   // ==================== 评价相关 ====================
   /// 评价列表

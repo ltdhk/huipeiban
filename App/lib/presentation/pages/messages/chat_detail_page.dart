@@ -33,7 +33,7 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.conversation.otherParty?.name ?? widget.conversation.title ?? '聊天'),
+        title: Text(widget.conversation.otherParty?.nickname ?? '聊天'),
       ),
       body: Column(
         children: [

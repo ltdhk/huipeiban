@@ -26,6 +26,9 @@ class User(db.Model):
     wechat_openid = db.Column(db.String(100), unique=True, comment='微信OpenID')
     wechat_unionid = db.Column(db.String(100), comment='微信UnionID')
 
+    # 用户类型
+    user_type = db.Column(db.String(20), default='patient', comment='用户类型: patient/companion/institution')
+
     # 账户信息
     balance = db.Column(db.Numeric(10, 2), default=0.00, comment='账户余额')
     points = db.Column(db.Integer, default=0, comment='积分')
@@ -71,6 +74,7 @@ class User(db.Model):
             'avatar_url': self.avatar_url,
             'gender': self.gender,
             'birth_date': self.birth_date.isoformat() if self.birth_date else None,
+            'user_type': self.user_type,
             'balance': float(self.balance) if self.balance else 0.0,
             'points': self.points,
             'member_level': self.member_level,

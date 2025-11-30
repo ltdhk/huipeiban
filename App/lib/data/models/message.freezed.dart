@@ -21,22 +21,29 @@ Conversation _$ConversationFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Conversation {
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
-  int get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'companion_id')
-  int? get companionId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'institution_id')
-  int? get institutionId => throw _privateConstructorUsedError;
-  String? get title => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user1_id')
+  int get user1Id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user2_id')
+  int get user2Id => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_message')
   String? get lastMessage => throw _privateConstructorUsedError;
-  @JsonKey(name: 'unread_count')
-  int get unreadCount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'last_message_at')
+  DateTime? get lastMessageAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user1_unread')
+  int get user1Unread => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user2_unread')
+  int get user2Unread => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  DateTime? get updatedAt => throw _privateConstructorUsedError; // 对方信息
+  DateTime? get updatedAt =>
+      throw _privateConstructorUsedError; // 当前用户的未读数（由后端根据当前用户计算）
+  @JsonKey(name: 'unread_count')
+  int get unreadCount =>
+      throw _privateConstructorUsedError; // 对方用户ID（由后端根据当前用户计算）
+  @JsonKey(name: 'other_user_id')
+  int? get otherUserId => throw _privateConstructorUsedError; // 对方信息
   @JsonKey(name: 'other_party')
   OtherParty? get otherParty => throw _privateConstructorUsedError;
 
@@ -54,15 +61,17 @@ abstract class $ConversationCopyWith<$Res> {
   @useResult
   $Res call(
       {int id,
-      @JsonKey(name: 'user_id') int userId,
-      @JsonKey(name: 'companion_id') int? companionId,
-      @JsonKey(name: 'institution_id') int? institutionId,
-      String? title,
+      @JsonKey(name: 'user1_id') int user1Id,
+      @JsonKey(name: 'user2_id') int user2Id,
       @JsonKey(name: 'last_message') String? lastMessage,
-      @JsonKey(name: 'unread_count') int unreadCount,
+      @JsonKey(name: 'last_message_at') DateTime? lastMessageAt,
+      @JsonKey(name: 'user1_unread') int user1Unread,
+      @JsonKey(name: 'user2_unread') int user2Unread,
       String status,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'unread_count') int unreadCount,
+      @JsonKey(name: 'other_user_id') int? otherUserId,
       @JsonKey(name: 'other_party') OtherParty? otherParty});
 
   $OtherPartyCopyWith<$Res>? get otherParty;
@@ -82,15 +91,17 @@ class _$ConversationCopyWithImpl<$Res, $Val extends Conversation>
   @override
   $Res call({
     Object? id = null,
-    Object? userId = null,
-    Object? companionId = freezed,
-    Object? institutionId = freezed,
-    Object? title = freezed,
+    Object? user1Id = null,
+    Object? user2Id = null,
     Object? lastMessage = freezed,
-    Object? unreadCount = null,
+    Object? lastMessageAt = freezed,
+    Object? user1Unread = null,
+    Object? user2Unread = null,
     Object? status = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? unreadCount = null,
+    Object? otherUserId = freezed,
     Object? otherParty = freezed,
   }) {
     return _then(_value.copyWith(
@@ -98,29 +109,29 @@ class _$ConversationCopyWithImpl<$Res, $Val extends Conversation>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
+      user1Id: null == user1Id
+          ? _value.user1Id
+          : user1Id // ignore: cast_nullable_to_non_nullable
               as int,
-      companionId: freezed == companionId
-          ? _value.companionId
-          : companionId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      institutionId: freezed == institutionId
-          ? _value.institutionId
-          : institutionId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
+      user2Id: null == user2Id
+          ? _value.user2Id
+          : user2Id // ignore: cast_nullable_to_non_nullable
+              as int,
       lastMessage: freezed == lastMessage
           ? _value.lastMessage
           : lastMessage // ignore: cast_nullable_to_non_nullable
               as String?,
-      unreadCount: null == unreadCount
-          ? _value.unreadCount
-          : unreadCount // ignore: cast_nullable_to_non_nullable
+      lastMessageAt: freezed == lastMessageAt
+          ? _value.lastMessageAt
+          : lastMessageAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      user1Unread: null == user1Unread
+          ? _value.user1Unread
+          : user1Unread // ignore: cast_nullable_to_non_nullable
+              as int,
+      user2Unread: null == user2Unread
+          ? _value.user2Unread
+          : user2Unread // ignore: cast_nullable_to_non_nullable
               as int,
       status: null == status
           ? _value.status
@@ -134,6 +145,14 @@ class _$ConversationCopyWithImpl<$Res, $Val extends Conversation>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      unreadCount: null == unreadCount
+          ? _value.unreadCount
+          : unreadCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      otherUserId: freezed == otherUserId
+          ? _value.otherUserId
+          : otherUserId // ignore: cast_nullable_to_non_nullable
+              as int?,
       otherParty: freezed == otherParty
           ? _value.otherParty
           : otherParty // ignore: cast_nullable_to_non_nullable
@@ -164,15 +183,17 @@ abstract class _$$ConversationImplCopyWith<$Res>
   @useResult
   $Res call(
       {int id,
-      @JsonKey(name: 'user_id') int userId,
-      @JsonKey(name: 'companion_id') int? companionId,
-      @JsonKey(name: 'institution_id') int? institutionId,
-      String? title,
+      @JsonKey(name: 'user1_id') int user1Id,
+      @JsonKey(name: 'user2_id') int user2Id,
       @JsonKey(name: 'last_message') String? lastMessage,
-      @JsonKey(name: 'unread_count') int unreadCount,
+      @JsonKey(name: 'last_message_at') DateTime? lastMessageAt,
+      @JsonKey(name: 'user1_unread') int user1Unread,
+      @JsonKey(name: 'user2_unread') int user2Unread,
       String status,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'unread_count') int unreadCount,
+      @JsonKey(name: 'other_user_id') int? otherUserId,
       @JsonKey(name: 'other_party') OtherParty? otherParty});
 
   @override
@@ -191,15 +212,17 @@ class __$$ConversationImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? userId = null,
-    Object? companionId = freezed,
-    Object? institutionId = freezed,
-    Object? title = freezed,
+    Object? user1Id = null,
+    Object? user2Id = null,
     Object? lastMessage = freezed,
-    Object? unreadCount = null,
+    Object? lastMessageAt = freezed,
+    Object? user1Unread = null,
+    Object? user2Unread = null,
     Object? status = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? unreadCount = null,
+    Object? otherUserId = freezed,
     Object? otherParty = freezed,
   }) {
     return _then(_$ConversationImpl(
@@ -207,29 +230,29 @@ class __$$ConversationImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
+      user1Id: null == user1Id
+          ? _value.user1Id
+          : user1Id // ignore: cast_nullable_to_non_nullable
               as int,
-      companionId: freezed == companionId
-          ? _value.companionId
-          : companionId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      institutionId: freezed == institutionId
-          ? _value.institutionId
-          : institutionId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      title: freezed == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String?,
+      user2Id: null == user2Id
+          ? _value.user2Id
+          : user2Id // ignore: cast_nullable_to_non_nullable
+              as int,
       lastMessage: freezed == lastMessage
           ? _value.lastMessage
           : lastMessage // ignore: cast_nullable_to_non_nullable
               as String?,
-      unreadCount: null == unreadCount
-          ? _value.unreadCount
-          : unreadCount // ignore: cast_nullable_to_non_nullable
+      lastMessageAt: freezed == lastMessageAt
+          ? _value.lastMessageAt
+          : lastMessageAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      user1Unread: null == user1Unread
+          ? _value.user1Unread
+          : user1Unread // ignore: cast_nullable_to_non_nullable
+              as int,
+      user2Unread: null == user2Unread
+          ? _value.user2Unread
+          : user2Unread // ignore: cast_nullable_to_non_nullable
               as int,
       status: null == status
           ? _value.status
@@ -243,6 +266,14 @@ class __$$ConversationImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      unreadCount: null == unreadCount
+          ? _value.unreadCount
+          : unreadCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      otherUserId: freezed == otherUserId
+          ? _value.otherUserId
+          : otherUserId // ignore: cast_nullable_to_non_nullable
+              as int?,
       otherParty: freezed == otherParty
           ? _value.otherParty
           : otherParty // ignore: cast_nullable_to_non_nullable
@@ -256,15 +287,17 @@ class __$$ConversationImplCopyWithImpl<$Res>
 class _$ConversationImpl implements _Conversation {
   const _$ConversationImpl(
       {required this.id,
-      @JsonKey(name: 'user_id') required this.userId,
-      @JsonKey(name: 'companion_id') this.companionId,
-      @JsonKey(name: 'institution_id') this.institutionId,
-      this.title,
+      @JsonKey(name: 'user1_id') required this.user1Id,
+      @JsonKey(name: 'user2_id') required this.user2Id,
       @JsonKey(name: 'last_message') this.lastMessage,
-      @JsonKey(name: 'unread_count') this.unreadCount = 0,
+      @JsonKey(name: 'last_message_at') this.lastMessageAt,
+      @JsonKey(name: 'user1_unread') this.user1Unread = 0,
+      @JsonKey(name: 'user2_unread') this.user2Unread = 0,
       this.status = 'active',
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'unread_count') this.unreadCount = 0,
+      @JsonKey(name: 'other_user_id') this.otherUserId,
       @JsonKey(name: 'other_party') this.otherParty});
 
   factory _$ConversationImpl.fromJson(Map<String, dynamic> json) =>
@@ -273,22 +306,23 @@ class _$ConversationImpl implements _Conversation {
   @override
   final int id;
   @override
-  @JsonKey(name: 'user_id')
-  final int userId;
+  @JsonKey(name: 'user1_id')
+  final int user1Id;
   @override
-  @JsonKey(name: 'companion_id')
-  final int? companionId;
-  @override
-  @JsonKey(name: 'institution_id')
-  final int? institutionId;
-  @override
-  final String? title;
+  @JsonKey(name: 'user2_id')
+  final int user2Id;
   @override
   @JsonKey(name: 'last_message')
   final String? lastMessage;
   @override
-  @JsonKey(name: 'unread_count')
-  final int unreadCount;
+  @JsonKey(name: 'last_message_at')
+  final DateTime? lastMessageAt;
+  @override
+  @JsonKey(name: 'user1_unread')
+  final int user1Unread;
+  @override
+  @JsonKey(name: 'user2_unread')
+  final int user2Unread;
   @override
   @JsonKey()
   final String status;
@@ -298,6 +332,14 @@ class _$ConversationImpl implements _Conversation {
   @override
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
+// 当前用户的未读数（由后端根据当前用户计算）
+  @override
+  @JsonKey(name: 'unread_count')
+  final int unreadCount;
+// 对方用户ID（由后端根据当前用户计算）
+  @override
+  @JsonKey(name: 'other_user_id')
+  final int? otherUserId;
 // 对方信息
   @override
   @JsonKey(name: 'other_party')
@@ -305,7 +347,7 @@ class _$ConversationImpl implements _Conversation {
 
   @override
   String toString() {
-    return 'Conversation(id: $id, userId: $userId, companionId: $companionId, institutionId: $institutionId, title: $title, lastMessage: $lastMessage, unreadCount: $unreadCount, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, otherParty: $otherParty)';
+    return 'Conversation(id: $id, user1Id: $user1Id, user2Id: $user2Id, lastMessage: $lastMessage, lastMessageAt: $lastMessageAt, user1Unread: $user1Unread, user2Unread: $user2Unread, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, unreadCount: $unreadCount, otherUserId: $otherUserId, otherParty: $otherParty)';
   }
 
   @override
@@ -314,21 +356,25 @@ class _$ConversationImpl implements _Conversation {
         (other.runtimeType == runtimeType &&
             other is _$ConversationImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.companionId, companionId) ||
-                other.companionId == companionId) &&
-            (identical(other.institutionId, institutionId) ||
-                other.institutionId == institutionId) &&
-            (identical(other.title, title) || other.title == title) &&
+            (identical(other.user1Id, user1Id) || other.user1Id == user1Id) &&
+            (identical(other.user2Id, user2Id) || other.user2Id == user2Id) &&
             (identical(other.lastMessage, lastMessage) ||
                 other.lastMessage == lastMessage) &&
-            (identical(other.unreadCount, unreadCount) ||
-                other.unreadCount == unreadCount) &&
+            (identical(other.lastMessageAt, lastMessageAt) ||
+                other.lastMessageAt == lastMessageAt) &&
+            (identical(other.user1Unread, user1Unread) ||
+                other.user1Unread == user1Unread) &&
+            (identical(other.user2Unread, user2Unread) ||
+                other.user2Unread == user2Unread) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
+            (identical(other.unreadCount, unreadCount) ||
+                other.unreadCount == unreadCount) &&
+            (identical(other.otherUserId, otherUserId) ||
+                other.otherUserId == otherUserId) &&
             (identical(other.otherParty, otherParty) ||
                 other.otherParty == otherParty));
   }
@@ -338,15 +384,17 @@ class _$ConversationImpl implements _Conversation {
   int get hashCode => Object.hash(
       runtimeType,
       id,
-      userId,
-      companionId,
-      institutionId,
-      title,
+      user1Id,
+      user2Id,
       lastMessage,
-      unreadCount,
+      lastMessageAt,
+      user1Unread,
+      user2Unread,
       status,
       createdAt,
       updatedAt,
+      unreadCount,
+      otherUserId,
       otherParty);
 
   @JsonKey(ignore: true)
@@ -366,15 +414,17 @@ class _$ConversationImpl implements _Conversation {
 abstract class _Conversation implements Conversation {
   const factory _Conversation(
           {required final int id,
-          @JsonKey(name: 'user_id') required final int userId,
-          @JsonKey(name: 'companion_id') final int? companionId,
-          @JsonKey(name: 'institution_id') final int? institutionId,
-          final String? title,
+          @JsonKey(name: 'user1_id') required final int user1Id,
+          @JsonKey(name: 'user2_id') required final int user2Id,
           @JsonKey(name: 'last_message') final String? lastMessage,
-          @JsonKey(name: 'unread_count') final int unreadCount,
+          @JsonKey(name: 'last_message_at') final DateTime? lastMessageAt,
+          @JsonKey(name: 'user1_unread') final int user1Unread,
+          @JsonKey(name: 'user2_unread') final int user2Unread,
           final String status,
           @JsonKey(name: 'created_at') final DateTime? createdAt,
           @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+          @JsonKey(name: 'unread_count') final int unreadCount,
+          @JsonKey(name: 'other_user_id') final int? otherUserId,
           @JsonKey(name: 'other_party') final OtherParty? otherParty}) =
       _$ConversationImpl;
 
@@ -384,22 +434,23 @@ abstract class _Conversation implements Conversation {
   @override
   int get id;
   @override
-  @JsonKey(name: 'user_id')
-  int get userId;
+  @JsonKey(name: 'user1_id')
+  int get user1Id;
   @override
-  @JsonKey(name: 'companion_id')
-  int? get companionId;
-  @override
-  @JsonKey(name: 'institution_id')
-  int? get institutionId;
-  @override
-  String? get title;
+  @JsonKey(name: 'user2_id')
+  int get user2Id;
   @override
   @JsonKey(name: 'last_message')
   String? get lastMessage;
   @override
-  @JsonKey(name: 'unread_count')
-  int get unreadCount;
+  @JsonKey(name: 'last_message_at')
+  DateTime? get lastMessageAt;
+  @override
+  @JsonKey(name: 'user1_unread')
+  int get user1Unread;
+  @override
+  @JsonKey(name: 'user2_unread')
+  int get user2Unread;
   @override
   String get status;
   @override
@@ -408,6 +459,12 @@ abstract class _Conversation implements Conversation {
   @override
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
+  @override // 当前用户的未读数（由后端根据当前用户计算）
+  @JsonKey(name: 'unread_count')
+  int get unreadCount;
+  @override // 对方用户ID（由后端根据当前用户计算）
+  @JsonKey(name: 'other_user_id')
+  int? get otherUserId;
   @override // 对方信息
   @JsonKey(name: 'other_party')
   OtherParty? get otherParty;
@@ -424,10 +481,12 @@ OtherParty _$OtherPartyFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$OtherParty {
   int get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'nickname')
+  String get nickname => throw _privateConstructorUsedError;
   @JsonKey(name: 'avatar_url')
   String? get avatarUrl => throw _privateConstructorUsedError;
-  String get type => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_type')
+  String? get userType => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -443,9 +502,9 @@ abstract class $OtherPartyCopyWith<$Res> {
   @useResult
   $Res call(
       {int id,
-      String name,
+      @JsonKey(name: 'nickname') String nickname,
       @JsonKey(name: 'avatar_url') String? avatarUrl,
-      String type});
+      @JsonKey(name: 'user_type') String? userType});
 }
 
 /// @nodoc
@@ -462,27 +521,27 @@ class _$OtherPartyCopyWithImpl<$Res, $Val extends OtherParty>
   @override
   $Res call({
     Object? id = null,
-    Object? name = null,
+    Object? nickname = null,
     Object? avatarUrl = freezed,
-    Object? type = null,
+    Object? userType = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
+      nickname: null == nickname
+          ? _value.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
               as String,
       avatarUrl: freezed == avatarUrl
           ? _value.avatarUrl
           : avatarUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
+      userType: freezed == userType
+          ? _value.userType
+          : userType // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -497,9 +556,9 @@ abstract class _$$OtherPartyImplCopyWith<$Res>
   @useResult
   $Res call(
       {int id,
-      String name,
+      @JsonKey(name: 'nickname') String nickname,
       @JsonKey(name: 'avatar_url') String? avatarUrl,
-      String type});
+      @JsonKey(name: 'user_type') String? userType});
 }
 
 /// @nodoc
@@ -514,27 +573,27 @@ class __$$OtherPartyImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? name = null,
+    Object? nickname = null,
     Object? avatarUrl = freezed,
-    Object? type = null,
+    Object? userType = freezed,
   }) {
     return _then(_$OtherPartyImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
+      nickname: null == nickname
+          ? _value.nickname
+          : nickname // ignore: cast_nullable_to_non_nullable
               as String,
       avatarUrl: freezed == avatarUrl
           ? _value.avatarUrl
           : avatarUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as String,
+      userType: freezed == userType
+          ? _value.userType
+          : userType // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -544,9 +603,9 @@ class __$$OtherPartyImplCopyWithImpl<$Res>
 class _$OtherPartyImpl implements _OtherParty {
   const _$OtherPartyImpl(
       {required this.id,
-      required this.name,
+      @JsonKey(name: 'nickname') required this.nickname,
       @JsonKey(name: 'avatar_url') this.avatarUrl,
-      required this.type});
+      @JsonKey(name: 'user_type') this.userType});
 
   factory _$OtherPartyImpl.fromJson(Map<String, dynamic> json) =>
       _$$OtherPartyImplFromJson(json);
@@ -554,16 +613,18 @@ class _$OtherPartyImpl implements _OtherParty {
   @override
   final int id;
   @override
-  final String name;
+  @JsonKey(name: 'nickname')
+  final String nickname;
   @override
   @JsonKey(name: 'avatar_url')
   final String? avatarUrl;
   @override
-  final String type;
+  @JsonKey(name: 'user_type')
+  final String? userType;
 
   @override
   String toString() {
-    return 'OtherParty(id: $id, name: $name, avatarUrl: $avatarUrl, type: $type)';
+    return 'OtherParty(id: $id, nickname: $nickname, avatarUrl: $avatarUrl, userType: $userType)';
   }
 
   @override
@@ -572,15 +633,18 @@ class _$OtherPartyImpl implements _OtherParty {
         (other.runtimeType == runtimeType &&
             other is _$OtherPartyImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name) &&
+            (identical(other.nickname, nickname) ||
+                other.nickname == nickname) &&
             (identical(other.avatarUrl, avatarUrl) ||
                 other.avatarUrl == avatarUrl) &&
-            (identical(other.type, type) || other.type == type));
+            (identical(other.userType, userType) ||
+                other.userType == userType));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, avatarUrl, type);
+  int get hashCode =>
+      Object.hash(runtimeType, id, nickname, avatarUrl, userType);
 
   @JsonKey(ignore: true)
   @override
@@ -599,9 +663,9 @@ class _$OtherPartyImpl implements _OtherParty {
 abstract class _OtherParty implements OtherParty {
   const factory _OtherParty(
       {required final int id,
-      required final String name,
+      @JsonKey(name: 'nickname') required final String nickname,
       @JsonKey(name: 'avatar_url') final String? avatarUrl,
-      required final String type}) = _$OtherPartyImpl;
+      @JsonKey(name: 'user_type') final String? userType}) = _$OtherPartyImpl;
 
   factory _OtherParty.fromJson(Map<String, dynamic> json) =
       _$OtherPartyImpl.fromJson;
@@ -609,12 +673,14 @@ abstract class _OtherParty implements OtherParty {
   @override
   int get id;
   @override
-  String get name;
+  @JsonKey(name: 'nickname')
+  String get nickname;
   @override
   @JsonKey(name: 'avatar_url')
   String? get avatarUrl;
   @override
-  String get type;
+  @JsonKey(name: 'user_type')
+  String? get userType;
   @override
   @JsonKey(ignore: true)
   _$$OtherPartyImplCopyWith<_$OtherPartyImpl> get copyWith =>
@@ -632,17 +698,15 @@ mixin _$Message {
   int get conversationId => throw _privateConstructorUsedError;
   @JsonKey(name: 'sender_id')
   int get senderId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'sender_type')
-  String get senderType => throw _privateConstructorUsedError;
   @JsonKey(name: 'receiver_id')
   int get receiverId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'receiver_type')
-  String get receiverType => throw _privateConstructorUsedError;
   @JsonKey(name: 'content_type')
   String get contentType => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_read')
   bool get isRead => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_deleted')
+  bool get isDeleted => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
@@ -660,12 +724,11 @@ abstract class $MessageCopyWith<$Res> {
       {int id,
       @JsonKey(name: 'conversation_id') int conversationId,
       @JsonKey(name: 'sender_id') int senderId,
-      @JsonKey(name: 'sender_type') String senderType,
       @JsonKey(name: 'receiver_id') int receiverId,
-      @JsonKey(name: 'receiver_type') String receiverType,
       @JsonKey(name: 'content_type') String contentType,
       String content,
       @JsonKey(name: 'is_read') bool isRead,
+      @JsonKey(name: 'is_deleted') bool isDeleted,
       @JsonKey(name: 'created_at') DateTime? createdAt});
 }
 
@@ -685,12 +748,11 @@ class _$MessageCopyWithImpl<$Res, $Val extends Message>
     Object? id = null,
     Object? conversationId = null,
     Object? senderId = null,
-    Object? senderType = null,
     Object? receiverId = null,
-    Object? receiverType = null,
     Object? contentType = null,
     Object? content = null,
     Object? isRead = null,
+    Object? isDeleted = null,
     Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -706,18 +768,10 @@ class _$MessageCopyWithImpl<$Res, $Val extends Message>
           ? _value.senderId
           : senderId // ignore: cast_nullable_to_non_nullable
               as int,
-      senderType: null == senderType
-          ? _value.senderType
-          : senderType // ignore: cast_nullable_to_non_nullable
-              as String,
       receiverId: null == receiverId
           ? _value.receiverId
           : receiverId // ignore: cast_nullable_to_non_nullable
               as int,
-      receiverType: null == receiverType
-          ? _value.receiverType
-          : receiverType // ignore: cast_nullable_to_non_nullable
-              as String,
       contentType: null == contentType
           ? _value.contentType
           : contentType // ignore: cast_nullable_to_non_nullable
@@ -729,6 +783,10 @@ class _$MessageCopyWithImpl<$Res, $Val extends Message>
       isRead: null == isRead
           ? _value.isRead
           : isRead // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isDeleted: null == isDeleted
+          ? _value.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
               as bool,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -749,12 +807,11 @@ abstract class _$$MessageImplCopyWith<$Res> implements $MessageCopyWith<$Res> {
       {int id,
       @JsonKey(name: 'conversation_id') int conversationId,
       @JsonKey(name: 'sender_id') int senderId,
-      @JsonKey(name: 'sender_type') String senderType,
       @JsonKey(name: 'receiver_id') int receiverId,
-      @JsonKey(name: 'receiver_type') String receiverType,
       @JsonKey(name: 'content_type') String contentType,
       String content,
       @JsonKey(name: 'is_read') bool isRead,
+      @JsonKey(name: 'is_deleted') bool isDeleted,
       @JsonKey(name: 'created_at') DateTime? createdAt});
 }
 
@@ -772,12 +829,11 @@ class __$$MessageImplCopyWithImpl<$Res>
     Object? id = null,
     Object? conversationId = null,
     Object? senderId = null,
-    Object? senderType = null,
     Object? receiverId = null,
-    Object? receiverType = null,
     Object? contentType = null,
     Object? content = null,
     Object? isRead = null,
+    Object? isDeleted = null,
     Object? createdAt = freezed,
   }) {
     return _then(_$MessageImpl(
@@ -793,18 +849,10 @@ class __$$MessageImplCopyWithImpl<$Res>
           ? _value.senderId
           : senderId // ignore: cast_nullable_to_non_nullable
               as int,
-      senderType: null == senderType
-          ? _value.senderType
-          : senderType // ignore: cast_nullable_to_non_nullable
-              as String,
       receiverId: null == receiverId
           ? _value.receiverId
           : receiverId // ignore: cast_nullable_to_non_nullable
               as int,
-      receiverType: null == receiverType
-          ? _value.receiverType
-          : receiverType // ignore: cast_nullable_to_non_nullable
-              as String,
       contentType: null == contentType
           ? _value.contentType
           : contentType // ignore: cast_nullable_to_non_nullable
@@ -816,6 +864,10 @@ class __$$MessageImplCopyWithImpl<$Res>
       isRead: null == isRead
           ? _value.isRead
           : isRead // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isDeleted: null == isDeleted
+          ? _value.isDeleted
+          : isDeleted // ignore: cast_nullable_to_non_nullable
               as bool,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -832,12 +884,11 @@ class _$MessageImpl implements _Message {
       {required this.id,
       @JsonKey(name: 'conversation_id') required this.conversationId,
       @JsonKey(name: 'sender_id') required this.senderId,
-      @JsonKey(name: 'sender_type') required this.senderType,
       @JsonKey(name: 'receiver_id') required this.receiverId,
-      @JsonKey(name: 'receiver_type') required this.receiverType,
       @JsonKey(name: 'content_type') this.contentType = 'text',
       required this.content,
       @JsonKey(name: 'is_read') this.isRead = false,
+      @JsonKey(name: 'is_deleted') this.isDeleted = false,
       @JsonKey(name: 'created_at') this.createdAt});
 
   factory _$MessageImpl.fromJson(Map<String, dynamic> json) =>
@@ -852,14 +903,8 @@ class _$MessageImpl implements _Message {
   @JsonKey(name: 'sender_id')
   final int senderId;
   @override
-  @JsonKey(name: 'sender_type')
-  final String senderType;
-  @override
   @JsonKey(name: 'receiver_id')
   final int receiverId;
-  @override
-  @JsonKey(name: 'receiver_type')
-  final String receiverType;
   @override
   @JsonKey(name: 'content_type')
   final String contentType;
@@ -869,12 +914,15 @@ class _$MessageImpl implements _Message {
   @JsonKey(name: 'is_read')
   final bool isRead;
   @override
+  @JsonKey(name: 'is_deleted')
+  final bool isDeleted;
+  @override
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Message(id: $id, conversationId: $conversationId, senderId: $senderId, senderType: $senderType, receiverId: $receiverId, receiverType: $receiverType, contentType: $contentType, content: $content, isRead: $isRead, createdAt: $createdAt)';
+    return 'Message(id: $id, conversationId: $conversationId, senderId: $senderId, receiverId: $receiverId, contentType: $contentType, content: $content, isRead: $isRead, isDeleted: $isDeleted, createdAt: $createdAt)';
   }
 
   @override
@@ -887,34 +935,22 @@ class _$MessageImpl implements _Message {
                 other.conversationId == conversationId) &&
             (identical(other.senderId, senderId) ||
                 other.senderId == senderId) &&
-            (identical(other.senderType, senderType) ||
-                other.senderType == senderType) &&
             (identical(other.receiverId, receiverId) ||
                 other.receiverId == receiverId) &&
-            (identical(other.receiverType, receiverType) ||
-                other.receiverType == receiverType) &&
             (identical(other.contentType, contentType) ||
                 other.contentType == contentType) &&
             (identical(other.content, content) || other.content == content) &&
             (identical(other.isRead, isRead) || other.isRead == isRead) &&
+            (identical(other.isDeleted, isDeleted) ||
+                other.isDeleted == isDeleted) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      conversationId,
-      senderId,
-      senderType,
-      receiverId,
-      receiverType,
-      contentType,
-      content,
-      isRead,
-      createdAt);
+  int get hashCode => Object.hash(runtimeType, id, conversationId, senderId,
+      receiverId, contentType, content, isRead, isDeleted, createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -935,12 +971,11 @@ abstract class _Message implements Message {
       {required final int id,
       @JsonKey(name: 'conversation_id') required final int conversationId,
       @JsonKey(name: 'sender_id') required final int senderId,
-      @JsonKey(name: 'sender_type') required final String senderType,
       @JsonKey(name: 'receiver_id') required final int receiverId,
-      @JsonKey(name: 'receiver_type') required final String receiverType,
       @JsonKey(name: 'content_type') final String contentType,
       required final String content,
       @JsonKey(name: 'is_read') final bool isRead,
+      @JsonKey(name: 'is_deleted') final bool isDeleted,
       @JsonKey(name: 'created_at') final DateTime? createdAt}) = _$MessageImpl;
 
   factory _Message.fromJson(Map<String, dynamic> json) = _$MessageImpl.fromJson;
@@ -954,14 +989,8 @@ abstract class _Message implements Message {
   @JsonKey(name: 'sender_id')
   int get senderId;
   @override
-  @JsonKey(name: 'sender_type')
-  String get senderType;
-  @override
   @JsonKey(name: 'receiver_id')
   int get receiverId;
-  @override
-  @JsonKey(name: 'receiver_type')
-  String get receiverType;
   @override
   @JsonKey(name: 'content_type')
   String get contentType;
@@ -970,6 +999,9 @@ abstract class _Message implements Message {
   @override
   @JsonKey(name: 'is_read')
   bool get isRead;
+  @override
+  @JsonKey(name: 'is_deleted')
+  bool get isDeleted;
   @override
   @JsonKey(name: 'created_at')
   DateTime? get createdAt;
@@ -985,10 +1017,6 @@ SendMessageRequest _$SendMessageRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$SendMessageRequest {
-  @JsonKey(name: 'receiver_id')
-  int get receiverId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'receiver_type')
-  String get receiverType => throw _privateConstructorUsedError;
   @JsonKey(name: 'content_type')
   String get contentType => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
@@ -1006,10 +1034,7 @@ abstract class $SendMessageRequestCopyWith<$Res> {
       _$SendMessageRequestCopyWithImpl<$Res, SendMessageRequest>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'receiver_id') int receiverId,
-      @JsonKey(name: 'receiver_type') String receiverType,
-      @JsonKey(name: 'content_type') String contentType,
-      String content});
+      {@JsonKey(name: 'content_type') String contentType, String content});
 }
 
 /// @nodoc
@@ -1025,20 +1050,10 @@ class _$SendMessageRequestCopyWithImpl<$Res, $Val extends SendMessageRequest>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? receiverId = null,
-    Object? receiverType = null,
     Object? contentType = null,
     Object? content = null,
   }) {
     return _then(_value.copyWith(
-      receiverId: null == receiverId
-          ? _value.receiverId
-          : receiverId // ignore: cast_nullable_to_non_nullable
-              as int,
-      receiverType: null == receiverType
-          ? _value.receiverType
-          : receiverType // ignore: cast_nullable_to_non_nullable
-              as String,
       contentType: null == contentType
           ? _value.contentType
           : contentType // ignore: cast_nullable_to_non_nullable
@@ -1060,10 +1075,7 @@ abstract class _$$SendMessageRequestImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'receiver_id') int receiverId,
-      @JsonKey(name: 'receiver_type') String receiverType,
-      @JsonKey(name: 'content_type') String contentType,
-      String content});
+      {@JsonKey(name: 'content_type') String contentType, String content});
 }
 
 /// @nodoc
@@ -1077,20 +1089,10 @@ class __$$SendMessageRequestImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? receiverId = null,
-    Object? receiverType = null,
     Object? contentType = null,
     Object? content = null,
   }) {
     return _then(_$SendMessageRequestImpl(
-      receiverId: null == receiverId
-          ? _value.receiverId
-          : receiverId // ignore: cast_nullable_to_non_nullable
-              as int,
-      receiverType: null == receiverType
-          ? _value.receiverType
-          : receiverType // ignore: cast_nullable_to_non_nullable
-              as String,
       contentType: null == contentType
           ? _value.contentType
           : contentType // ignore: cast_nullable_to_non_nullable
@@ -1107,20 +1109,12 @@ class __$$SendMessageRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$SendMessageRequestImpl implements _SendMessageRequest {
   const _$SendMessageRequestImpl(
-      {@JsonKey(name: 'receiver_id') required this.receiverId,
-      @JsonKey(name: 'receiver_type') required this.receiverType,
-      @JsonKey(name: 'content_type') this.contentType = 'text',
+      {@JsonKey(name: 'content_type') this.contentType = 'text',
       required this.content});
 
   factory _$SendMessageRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$SendMessageRequestImplFromJson(json);
 
-  @override
-  @JsonKey(name: 'receiver_id')
-  final int receiverId;
-  @override
-  @JsonKey(name: 'receiver_type')
-  final String receiverType;
   @override
   @JsonKey(name: 'content_type')
   final String contentType;
@@ -1129,7 +1123,7 @@ class _$SendMessageRequestImpl implements _SendMessageRequest {
 
   @override
   String toString() {
-    return 'SendMessageRequest(receiverId: $receiverId, receiverType: $receiverType, contentType: $contentType, content: $content)';
+    return 'SendMessageRequest(contentType: $contentType, content: $content)';
   }
 
   @override
@@ -1137,10 +1131,6 @@ class _$SendMessageRequestImpl implements _SendMessageRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$SendMessageRequestImpl &&
-            (identical(other.receiverId, receiverId) ||
-                other.receiverId == receiverId) &&
-            (identical(other.receiverType, receiverType) ||
-                other.receiverType == receiverType) &&
             (identical(other.contentType, contentType) ||
                 other.contentType == contentType) &&
             (identical(other.content, content) || other.content == content));
@@ -1148,8 +1138,7 @@ class _$SendMessageRequestImpl implements _SendMessageRequest {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, receiverId, receiverType, contentType, content);
+  int get hashCode => Object.hash(runtimeType, contentType, content);
 
   @JsonKey(ignore: true)
   @override
@@ -1168,20 +1157,12 @@ class _$SendMessageRequestImpl implements _SendMessageRequest {
 
 abstract class _SendMessageRequest implements SendMessageRequest {
   const factory _SendMessageRequest(
-      {@JsonKey(name: 'receiver_id') required final int receiverId,
-      @JsonKey(name: 'receiver_type') required final String receiverType,
-      @JsonKey(name: 'content_type') final String contentType,
+      {@JsonKey(name: 'content_type') final String contentType,
       required final String content}) = _$SendMessageRequestImpl;
 
   factory _SendMessageRequest.fromJson(Map<String, dynamic> json) =
       _$SendMessageRequestImpl.fromJson;
 
-  @override
-  @JsonKey(name: 'receiver_id')
-  int get receiverId;
-  @override
-  @JsonKey(name: 'receiver_type')
-  String get receiverType;
   @override
   @JsonKey(name: 'content_type')
   String get contentType;

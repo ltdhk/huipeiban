@@ -27,7 +27,19 @@ mixin _$User {
   String? get avatarUrl => throw _privateConstructorUsedError;
   String? get gender => throw _privateConstructorUsedError;
   @JsonKey(name: 'birth_date')
-  DateTime? get birthDate => throw _privateConstructorUsedError;
+  DateTime? get birthDate => throw _privateConstructorUsedError; // 用户类型
+  @JsonKey(name: 'user_type', defaultValue: 'patient')
+  String get userType => throw _privateConstructorUsedError; // 陪诊师关联信息
+  @JsonKey(name: 'companion_id')
+  int? get companionId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'companion_info')
+  Map<String, dynamic>? get companionInfo =>
+      throw _privateConstructorUsedError; // 机构关联信息
+  @JsonKey(name: 'institution_id')
+  int? get institutionId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'institution_info')
+  Map<String, dynamic>? get institutionInfo =>
+      throw _privateConstructorUsedError; // 账户信息
   double get balance => throw _privateConstructorUsedError;
   int get points => throw _privateConstructorUsedError;
   @JsonKey(name: 'member_level')
@@ -59,6 +71,11 @@ abstract class $UserCopyWith<$Res> {
       @JsonKey(name: 'avatar_url') String? avatarUrl,
       String? gender,
       @JsonKey(name: 'birth_date') DateTime? birthDate,
+      @JsonKey(name: 'user_type', defaultValue: 'patient') String userType,
+      @JsonKey(name: 'companion_id') int? companionId,
+      @JsonKey(name: 'companion_info') Map<String, dynamic>? companionInfo,
+      @JsonKey(name: 'institution_id') int? institutionId,
+      @JsonKey(name: 'institution_info') Map<String, dynamic>? institutionInfo,
       double balance,
       int points,
       @JsonKey(name: 'member_level') String memberLevel,
@@ -88,6 +105,11 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? avatarUrl = freezed,
     Object? gender = freezed,
     Object? birthDate = freezed,
+    Object? userType = null,
+    Object? companionId = freezed,
+    Object? companionInfo = freezed,
+    Object? institutionId = freezed,
+    Object? institutionInfo = freezed,
     Object? balance = null,
     Object? points = null,
     Object? memberLevel = null,
@@ -122,6 +144,26 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.birthDate
           : birthDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      userType: null == userType
+          ? _value.userType
+          : userType // ignore: cast_nullable_to_non_nullable
+              as String,
+      companionId: freezed == companionId
+          ? _value.companionId
+          : companionId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      companionInfo: freezed == companionInfo
+          ? _value.companionInfo
+          : companionInfo // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      institutionId: freezed == institutionId
+          ? _value.institutionId
+          : institutionId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      institutionInfo: freezed == institutionInfo
+          ? _value.institutionInfo
+          : institutionInfo // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       balance: null == balance
           ? _value.balance
           : balance // ignore: cast_nullable_to_non_nullable
@@ -172,6 +214,11 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       @JsonKey(name: 'avatar_url') String? avatarUrl,
       String? gender,
       @JsonKey(name: 'birth_date') DateTime? birthDate,
+      @JsonKey(name: 'user_type', defaultValue: 'patient') String userType,
+      @JsonKey(name: 'companion_id') int? companionId,
+      @JsonKey(name: 'companion_info') Map<String, dynamic>? companionInfo,
+      @JsonKey(name: 'institution_id') int? institutionId,
+      @JsonKey(name: 'institution_info') Map<String, dynamic>? institutionInfo,
       double balance,
       int points,
       @JsonKey(name: 'member_level') String memberLevel,
@@ -198,6 +245,11 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? avatarUrl = freezed,
     Object? gender = freezed,
     Object? birthDate = freezed,
+    Object? userType = null,
+    Object? companionId = freezed,
+    Object? companionInfo = freezed,
+    Object? institutionId = freezed,
+    Object? institutionInfo = freezed,
     Object? balance = null,
     Object? points = null,
     Object? memberLevel = null,
@@ -232,6 +284,26 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.birthDate
           : birthDate // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      userType: null == userType
+          ? _value.userType
+          : userType // ignore: cast_nullable_to_non_nullable
+              as String,
+      companionId: freezed == companionId
+          ? _value.companionId
+          : companionId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      companionInfo: freezed == companionInfo
+          ? _value._companionInfo
+          : companionInfo // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      institutionId: freezed == institutionId
+          ? _value.institutionId
+          : institutionId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      institutionInfo: freezed == institutionInfo
+          ? _value._institutionInfo
+          : institutionInfo // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
       balance: null == balance
           ? _value.balance
           : balance // ignore: cast_nullable_to_non_nullable
@@ -270,7 +342,7 @@ class __$$UserImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$UserImpl implements _User {
+class _$UserImpl extends _User {
   const _$UserImpl(
       {required this.id,
       this.phone,
@@ -278,6 +350,14 @@ class _$UserImpl implements _User {
       @JsonKey(name: 'avatar_url') this.avatarUrl,
       this.gender,
       @JsonKey(name: 'birth_date') this.birthDate,
+      @JsonKey(name: 'user_type', defaultValue: 'patient')
+      this.userType = 'patient',
+      @JsonKey(name: 'companion_id') this.companionId,
+      @JsonKey(name: 'companion_info')
+      final Map<String, dynamic>? companionInfo,
+      @JsonKey(name: 'institution_id') this.institutionId,
+      @JsonKey(name: 'institution_info')
+      final Map<String, dynamic>? institutionInfo,
       this.balance = 0.0,
       this.points = 0,
       @JsonKey(name: 'member_level') this.memberLevel = '普通会员',
@@ -285,7 +365,10 @@ class _$UserImpl implements _User {
       @JsonKey(name: 'total_spent') this.totalSpent = 0.0,
       this.status = 'active',
       @JsonKey(name: 'created_at') this.createdAt,
-      @JsonKey(name: 'last_login_at') this.lastLoginAt});
+      @JsonKey(name: 'last_login_at') this.lastLoginAt})
+      : _companionInfo = companionInfo,
+        _institutionInfo = institutionInfo,
+        super._();
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -304,6 +387,41 @@ class _$UserImpl implements _User {
   @override
   @JsonKey(name: 'birth_date')
   final DateTime? birthDate;
+// 用户类型
+  @override
+  @JsonKey(name: 'user_type', defaultValue: 'patient')
+  final String userType;
+// 陪诊师关联信息
+  @override
+  @JsonKey(name: 'companion_id')
+  final int? companionId;
+  final Map<String, dynamic>? _companionInfo;
+  @override
+  @JsonKey(name: 'companion_info')
+  Map<String, dynamic>? get companionInfo {
+    final value = _companionInfo;
+    if (value == null) return null;
+    if (_companionInfo is EqualUnmodifiableMapView) return _companionInfo;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+// 机构关联信息
+  @override
+  @JsonKey(name: 'institution_id')
+  final int? institutionId;
+  final Map<String, dynamic>? _institutionInfo;
+  @override
+  @JsonKey(name: 'institution_info')
+  Map<String, dynamic>? get institutionInfo {
+    final value = _institutionInfo;
+    if (value == null) return null;
+    if (_institutionInfo is EqualUnmodifiableMapView) return _institutionInfo;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+// 账户信息
   @override
   @JsonKey()
   final double balance;
@@ -331,7 +449,7 @@ class _$UserImpl implements _User {
 
   @override
   String toString() {
-    return 'User(id: $id, phone: $phone, nickname: $nickname, avatarUrl: $avatarUrl, gender: $gender, birthDate: $birthDate, balance: $balance, points: $points, memberLevel: $memberLevel, totalOrders: $totalOrders, totalSpent: $totalSpent, status: $status, createdAt: $createdAt, lastLoginAt: $lastLoginAt)';
+    return 'User(id: $id, phone: $phone, nickname: $nickname, avatarUrl: $avatarUrl, gender: $gender, birthDate: $birthDate, userType: $userType, companionId: $companionId, companionInfo: $companionInfo, institutionId: $institutionId, institutionInfo: $institutionInfo, balance: $balance, points: $points, memberLevel: $memberLevel, totalOrders: $totalOrders, totalSpent: $totalSpent, status: $status, createdAt: $createdAt, lastLoginAt: $lastLoginAt)';
   }
 
   @override
@@ -348,6 +466,16 @@ class _$UserImpl implements _User {
             (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.birthDate, birthDate) ||
                 other.birthDate == birthDate) &&
+            (identical(other.userType, userType) ||
+                other.userType == userType) &&
+            (identical(other.companionId, companionId) ||
+                other.companionId == companionId) &&
+            const DeepCollectionEquality()
+                .equals(other._companionInfo, _companionInfo) &&
+            (identical(other.institutionId, institutionId) ||
+                other.institutionId == institutionId) &&
+            const DeepCollectionEquality()
+                .equals(other._institutionInfo, _institutionInfo) &&
             (identical(other.balance, balance) || other.balance == balance) &&
             (identical(other.points, points) || other.points == points) &&
             (identical(other.memberLevel, memberLevel) ||
@@ -365,22 +493,28 @@ class _$UserImpl implements _User {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      phone,
-      nickname,
-      avatarUrl,
-      gender,
-      birthDate,
-      balance,
-      points,
-      memberLevel,
-      totalOrders,
-      totalSpent,
-      status,
-      createdAt,
-      lastLoginAt);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        phone,
+        nickname,
+        avatarUrl,
+        gender,
+        birthDate,
+        userType,
+        companionId,
+        const DeepCollectionEquality().hash(_companionInfo),
+        institutionId,
+        const DeepCollectionEquality().hash(_institutionInfo),
+        balance,
+        points,
+        memberLevel,
+        totalOrders,
+        totalSpent,
+        status,
+        createdAt,
+        lastLoginAt
+      ]);
 
   @JsonKey(ignore: true)
   @override
@@ -396,7 +530,7 @@ class _$UserImpl implements _User {
   }
 }
 
-abstract class _User implements User {
+abstract class _User extends User {
   const factory _User(
           {required final int id,
           final String? phone,
@@ -404,6 +538,14 @@ abstract class _User implements User {
           @JsonKey(name: 'avatar_url') final String? avatarUrl,
           final String? gender,
           @JsonKey(name: 'birth_date') final DateTime? birthDate,
+          @JsonKey(name: 'user_type', defaultValue: 'patient')
+          final String userType,
+          @JsonKey(name: 'companion_id') final int? companionId,
+          @JsonKey(name: 'companion_info')
+          final Map<String, dynamic>? companionInfo,
+          @JsonKey(name: 'institution_id') final int? institutionId,
+          @JsonKey(name: 'institution_info')
+          final Map<String, dynamic>? institutionInfo,
           final double balance,
           final int points,
           @JsonKey(name: 'member_level') final String memberLevel,
@@ -413,6 +555,7 @@ abstract class _User implements User {
           @JsonKey(name: 'created_at') final DateTime? createdAt,
           @JsonKey(name: 'last_login_at') final DateTime? lastLoginAt}) =
       _$UserImpl;
+  const _User._() : super._();
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
@@ -430,7 +573,22 @@ abstract class _User implements User {
   @override
   @JsonKey(name: 'birth_date')
   DateTime? get birthDate;
+  @override // 用户类型
+  @JsonKey(name: 'user_type', defaultValue: 'patient')
+  String get userType;
+  @override // 陪诊师关联信息
+  @JsonKey(name: 'companion_id')
+  int? get companionId;
   @override
+  @JsonKey(name: 'companion_info')
+  Map<String, dynamic>? get companionInfo;
+  @override // 机构关联信息
+  @JsonKey(name: 'institution_id')
+  int? get institutionId;
+  @override
+  @JsonKey(name: 'institution_info')
+  Map<String, dynamic>? get institutionInfo;
+  @override // 账户信息
   double get balance;
   @override
   int get points;

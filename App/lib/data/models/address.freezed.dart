@@ -20,8 +20,9 @@ Address _$AddressFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Address {
+  @JsonKey(fromJson: _intFromJson)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _intFromJson)
   int get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'contact_name')
   String get contactName => throw _privateConstructorUsedError;
@@ -55,8 +56,8 @@ abstract class $AddressCopyWith<$Res> {
       _$AddressCopyWithImpl<$Res, Address>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') int userId,
+      {@JsonKey(fromJson: _intFromJson) int id,
+      @JsonKey(name: 'user_id', fromJson: _intFromJson) int userId,
       @JsonKey(name: 'contact_name') String contactName,
       @JsonKey(name: 'contact_phone') String contactPhone,
       String province,
@@ -174,8 +175,8 @@ abstract class _$$AddressImplCopyWith<$Res> implements $AddressCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') int userId,
+      {@JsonKey(fromJson: _intFromJson) int id,
+      @JsonKey(name: 'user_id', fromJson: _intFromJson) int userId,
       @JsonKey(name: 'contact_name') String contactName,
       @JsonKey(name: 'contact_phone') String contactPhone,
       String province,
@@ -287,14 +288,14 @@ class __$$AddressImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$AddressImpl implements _Address {
   const _$AddressImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') required this.userId,
-      @JsonKey(name: 'contact_name') required this.contactName,
-      @JsonKey(name: 'contact_phone') required this.contactPhone,
-      required this.province,
-      required this.city,
-      required this.district,
-      @JsonKey(name: 'detail_address') required this.detailAddress,
+      {@JsonKey(fromJson: _intFromJson) this.id = 0,
+      @JsonKey(name: 'user_id', fromJson: _intFromJson) this.userId = 0,
+      @JsonKey(name: 'contact_name') this.contactName = '',
+      @JsonKey(name: 'contact_phone') this.contactPhone = '',
+      this.province = '',
+      this.city = '',
+      this.district = '',
+      @JsonKey(name: 'detail_address') this.detailAddress = '',
       this.latitude,
       this.longitude,
       @JsonKey(name: 'address_type') this.addressType = 'other',
@@ -307,9 +308,10 @@ class _$AddressImpl implements _Address {
       _$$AddressImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _intFromJson)
   final int id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _intFromJson)
   final int userId;
   @override
   @JsonKey(name: 'contact_name')
@@ -318,10 +320,13 @@ class _$AddressImpl implements _Address {
   @JsonKey(name: 'contact_phone')
   final String contactPhone;
   @override
+  @JsonKey()
   final String province;
   @override
+  @JsonKey()
   final String city;
   @override
+  @JsonKey()
   final String district;
   @override
   @JsonKey(name: 'detail_address')
@@ -419,14 +424,14 @@ class _$AddressImpl implements _Address {
 
 abstract class _Address implements Address {
   const factory _Address(
-      {required final int id,
-      @JsonKey(name: 'user_id') required final int userId,
-      @JsonKey(name: 'contact_name') required final String contactName,
-      @JsonKey(name: 'contact_phone') required final String contactPhone,
-      required final String province,
-      required final String city,
-      required final String district,
-      @JsonKey(name: 'detail_address') required final String detailAddress,
+      {@JsonKey(fromJson: _intFromJson) final int id,
+      @JsonKey(name: 'user_id', fromJson: _intFromJson) final int userId,
+      @JsonKey(name: 'contact_name') final String contactName,
+      @JsonKey(name: 'contact_phone') final String contactPhone,
+      final String province,
+      final String city,
+      final String district,
+      @JsonKey(name: 'detail_address') final String detailAddress,
       final double? latitude,
       final double? longitude,
       @JsonKey(name: 'address_type') final String addressType,
@@ -438,9 +443,10 @@ abstract class _Address implements Address {
   factory _Address.fromJson(Map<String, dynamic> json) = _$AddressImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _intFromJson)
   int get id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _intFromJson)
   int get userId;
   @override
   @JsonKey(name: 'contact_name')

@@ -13,6 +13,9 @@ class Institution(db.Model):
 
     id = db.Column(db.BigInteger, primary_key=True)
 
+    # 关联用户ID
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'), unique=True, nullable=False, comment='用户ID')
+
     # 基本信息
     name = db.Column(db.String(100), nullable=False, comment='机构名称')
     logo_url = db.Column(db.String(255), comment='LOGO URL')
@@ -67,11 +70,13 @@ class Institution(db.Model):
     is_deleted = db.Column(db.Boolean, default=False, comment='是否删除')
 
     # 关系
+    user = db.relationship('User', backref='institution_profile', uselist=False)
     companions = db.relationship('Companion', backref='institution', lazy='dynamic')
     orders = db.relationship('Order', backref='institution', lazy='dynamic')
 
     # 索引
     __table_args__ = (
+        Index('idx_institutions_user_id', 'user_id'),
         Index('idx_institutions_status', 'status'),
         Index('idx_institutions_city', 'city'),
         Index('idx_institutions_rating', 'rating'),
@@ -81,6 +86,7 @@ class Institution(db.Model):
         """转换为字典"""
         return {
             'id': self.id,
+            'user_id': self.user_id,
             'name': self.name,
             'logo_url': self.logo_url,
             'phone': self.phone,
@@ -109,11 +115,11 @@ class Companion(db.Model):
 
     id = db.Column(db.BigInteger, primary_key=True)
 
+    # 关联用户ID
+    user_id = db.Column(db.BigInteger, db.ForeignKey('users.id'), unique=True, nullable=False, comment='用户ID')
+
     # 基本信息
-    phone = db.Column(db.String(20), unique=True, nullable=False, comment='手机号')
-    password_hash = db.Column(db.String(255), nullable=False, comment='密码哈希')
     name = db.Column(db.String(50), nullable=False, comment='姓名')
-    avatar_url = db.Column(db.String(255), comment='头像 URL')
     gender = db.Column(db.String(10), comment='性别')
     age = db.Column(db.Integer, comment='年龄')
     id_card = db.Column(db.String(100), nullable=False, comment='身份证号（加密）')
@@ -171,9 +177,12 @@ class Companion(db.Model):
     services = db.relationship('Service', backref='companion', lazy='dynamic')
     orders = db.relationship('Order', backref='companion', lazy='dynamic')
 
+    # 关系
+    user = db.relationship('User', backref='companion_profile', uselist=False)
+
     # 索引
     __table_args__ = (
-        Index('idx_companions_phone', 'phone'),
+        Index('idx_companions_user_id', 'user_id'),
         Index('idx_companions_institution_id', 'institution_id'),
         Index('idx_companions_status', 'status'),
         Index('idx_companions_rating', 'rating'),
@@ -184,10 +193,19 @@ class Companion(db.Model):
         """转换为字典"""
         import json
 
+        # 从关联的 User 获取头像和电话
+        avatar_url = None
+        phone = None
+        if self.user:
+            avatar_url = self.user.avatar_url
+            phone = self.user.phone
+
         data = {
             'id': self.id,
+            'user_id': self.user_id,
             'name': self.name,
-            'avatar_url': self.avatar_url,
+            'avatar_url': avatar_url,
+            'phone': phone,
             'gender': self.gender,
             'age': self.age,
             'institution_id': self.institution_id,
@@ -210,7 +228,6 @@ class Companion(db.Model):
         }
 
         if include_sensitive:
-            data['phone'] = self.phone
             data['total_income'] = float(self.total_income) if self.total_income else 0.0
             data['available_balance'] = float(self.available_balance) if self.available_balance else 0.0
 

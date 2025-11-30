@@ -8,8 +8,9 @@ part of 'companion.dart';
 
 _$CompanionImpl _$$CompanionImplFromJson(Map<String, dynamic> json) =>
     _$CompanionImpl(
-      id: (json['id'] as num).toInt(),
-      name: json['name'] as String,
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      userId: (json['user_id'] as num?)?.toInt(),
+      name: json['name'] as String? ?? '',
       avatarUrl: json['avatar_url'] as String?,
       gender: json['gender'] as String?,
       age: (json['age'] as num?)?.toInt(),
@@ -45,6 +46,7 @@ _$CompanionImpl _$$CompanionImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$CompanionImplToJson(_$CompanionImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'user_id': instance.userId,
       'name': instance.name,
       'avatar_url': instance.avatarUrl,
       'gender': instance.gender,

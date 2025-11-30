@@ -21,6 +21,10 @@ Companion _$CompanionFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Companion {
   int get id => throw _privateConstructorUsedError;
+
+  /// 关联的用户ID（用于即时通讯）
+  @JsonKey(name: 'user_id')
+  int? get userId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   @JsonKey(name: 'avatar_url')
   String? get avatarUrl => throw _privateConstructorUsedError;
@@ -72,6 +76,7 @@ abstract class $CompanionCopyWith<$Res> {
   @useResult
   $Res call(
       {int id,
+      @JsonKey(name: 'user_id') int? userId,
       String name,
       @JsonKey(name: 'avatar_url') String? avatarUrl,
       String? gender,
@@ -109,6 +114,7 @@ class _$CompanionCopyWithImpl<$Res, $Val extends Companion>
   @override
   $Res call({
     Object? id = null,
+    Object? userId = freezed,
     Object? name = null,
     Object? avatarUrl = freezed,
     Object? gender = freezed,
@@ -136,6 +142,10 @@ class _$CompanionCopyWithImpl<$Res, $Val extends Companion>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -234,6 +244,7 @@ abstract class _$$CompanionImplCopyWith<$Res>
   @useResult
   $Res call(
       {int id,
+      @JsonKey(name: 'user_id') int? userId,
       String name,
       @JsonKey(name: 'avatar_url') String? avatarUrl,
       String? gender,
@@ -269,6 +280,7 @@ class __$$CompanionImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
+    Object? userId = freezed,
     Object? name = null,
     Object? avatarUrl = freezed,
     Object? gender = freezed,
@@ -296,6 +308,10 @@ class __$$CompanionImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -388,8 +404,9 @@ class __$$CompanionImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CompanionImpl implements _Companion {
   const _$CompanionImpl(
-      {required this.id,
-      required this.name,
+      {this.id = 0,
+      @JsonKey(name: 'user_id') this.userId,
+      this.name = '',
       @JsonKey(name: 'avatar_url') this.avatarUrl,
       this.gender,
       this.age,
@@ -419,8 +436,15 @@ class _$CompanionImpl implements _Companion {
       _$$CompanionImplFromJson(json);
 
   @override
+  @JsonKey()
   final int id;
+
+  /// 关联的用户ID（用于即时通讯）
   @override
+  @JsonKey(name: 'user_id')
+  final int? userId;
+  @override
+  @JsonKey()
   final String name;
   @override
   @JsonKey(name: 'avatar_url')
@@ -515,7 +539,7 @@ class _$CompanionImpl implements _Companion {
 
   @override
   String toString() {
-    return 'Companion(id: $id, name: $name, avatarUrl: $avatarUrl, gender: $gender, age: $age, institutionId: $institutionId, serviceYears: $serviceYears, introduction: $introduction, hasCar: $hasCar, carType: $carType, rating: $rating, reviewCount: $reviewCount, totalOrders: $totalOrders, completedOrders: $completedOrders, status: $status, isVerified: $isVerified, isOnline: $isOnline, serviceHospitals: $serviceHospitals, serviceArea: $serviceArea, specialties: $specialties, certificates: $certificates, createdAt: $createdAt)';
+    return 'Companion(id: $id, userId: $userId, name: $name, avatarUrl: $avatarUrl, gender: $gender, age: $age, institutionId: $institutionId, serviceYears: $serviceYears, introduction: $introduction, hasCar: $hasCar, carType: $carType, rating: $rating, reviewCount: $reviewCount, totalOrders: $totalOrders, completedOrders: $completedOrders, status: $status, isVerified: $isVerified, isOnline: $isOnline, serviceHospitals: $serviceHospitals, serviceArea: $serviceArea, specialties: $specialties, certificates: $certificates, createdAt: $createdAt)';
   }
 
   @override
@@ -524,6 +548,7 @@ class _$CompanionImpl implements _Companion {
         (other.runtimeType == runtimeType &&
             other is _$CompanionImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.avatarUrl, avatarUrl) ||
                 other.avatarUrl == avatarUrl) &&
@@ -566,6 +591,7 @@ class _$CompanionImpl implements _Companion {
   int get hashCode => Object.hashAll([
         runtimeType,
         id,
+        userId,
         name,
         avatarUrl,
         gender,
@@ -605,8 +631,9 @@ class _$CompanionImpl implements _Companion {
 
 abstract class _Companion implements Companion {
   const factory _Companion(
-      {required final int id,
-      required final String name,
+      {final int id,
+      @JsonKey(name: 'user_id') final int? userId,
+      final String name,
       @JsonKey(name: 'avatar_url') final String? avatarUrl,
       final String? gender,
       final int? age,
@@ -634,6 +661,11 @@ abstract class _Companion implements Companion {
 
   @override
   int get id;
+  @override
+
+  /// 关联的用户ID（用于即时通讯）
+  @JsonKey(name: 'user_id')
+  int? get userId;
   @override
   String get name;
   @override

@@ -81,6 +81,7 @@ mixin _$Order {
   @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson)
   DateTime? get updatedAt => throw _privateConstructorUsedError; // 关联数据
   Companion? get companion => throw _privateConstructorUsedError;
+  Institution? get institution => throw _privateConstructorUsedError;
   Patient? get patient => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -138,9 +139,11 @@ abstract class $OrderCopyWith<$Res> {
       @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson)
       DateTime? updatedAt,
       Companion? companion,
+      Institution? institution,
       Patient? patient});
 
   $CompanionCopyWith<$Res>? get companion;
+  $InstitutionCopyWith<$Res>? get institution;
   $PatientCopyWith<$Res>? get patient;
 }
 
@@ -189,6 +192,7 @@ class _$OrderCopyWithImpl<$Res, $Val extends Order>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? companion = freezed,
+    Object? institution = freezed,
     Object? patient = freezed,
   }) {
     return _then(_value.copyWith(
@@ -320,6 +324,10 @@ class _$OrderCopyWithImpl<$Res, $Val extends Order>
           ? _value.companion
           : companion // ignore: cast_nullable_to_non_nullable
               as Companion?,
+      institution: freezed == institution
+          ? _value.institution
+          : institution // ignore: cast_nullable_to_non_nullable
+              as Institution?,
       patient: freezed == patient
           ? _value.patient
           : patient // ignore: cast_nullable_to_non_nullable
@@ -336,6 +344,18 @@ class _$OrderCopyWithImpl<$Res, $Val extends Order>
 
     return $CompanionCopyWith<$Res>(_value.companion!, (value) {
       return _then(_value.copyWith(companion: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $InstitutionCopyWith<$Res>? get institution {
+    if (_value.institution == null) {
+      return null;
+    }
+
+    return $InstitutionCopyWith<$Res>(_value.institution!, (value) {
+      return _then(_value.copyWith(institution: value) as $Val);
     });
   }
 
@@ -404,10 +424,13 @@ abstract class _$$OrderImplCopyWith<$Res> implements $OrderCopyWith<$Res> {
       @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson)
       DateTime? updatedAt,
       Companion? companion,
+      Institution? institution,
       Patient? patient});
 
   @override
   $CompanionCopyWith<$Res>? get companion;
+  @override
+  $InstitutionCopyWith<$Res>? get institution;
   @override
   $PatientCopyWith<$Res>? get patient;
 }
@@ -455,6 +478,7 @@ class __$$OrderImplCopyWithImpl<$Res>
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
     Object? companion = freezed,
+    Object? institution = freezed,
     Object? patient = freezed,
   }) {
     return _then(_$OrderImpl(
@@ -586,6 +610,10 @@ class __$$OrderImplCopyWithImpl<$Res>
           ? _value.companion
           : companion // ignore: cast_nullable_to_non_nullable
               as Companion?,
+      institution: freezed == institution
+          ? _value.institution
+          : institution // ignore: cast_nullable_to_non_nullable
+              as Institution?,
       patient: freezed == patient
           ? _value.patient
           : patient // ignore: cast_nullable_to_non_nullable
@@ -640,6 +668,7 @@ class _$OrderImpl implements _Order {
       @JsonKey(name: 'created_at', fromJson: _dateTimeFromJson) this.createdAt,
       @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson) this.updatedAt,
       this.companion,
+      this.institution,
       this.patient});
 
   factory _$OrderImpl.fromJson(Map<String, dynamic> json) =>
@@ -741,11 +770,13 @@ class _$OrderImpl implements _Order {
   @override
   final Companion? companion;
   @override
+  final Institution? institution;
+  @override
   final Patient? patient;
 
   @override
   String toString() {
-    return 'Order(id: $id, orderNo: $orderNo, userId: $userId, patientId: $patientId, orderType: $orderType, companionId: $companionId, institutionId: $institutionId, hospitalName: $hospitalName, hospitalAddress: $hospitalAddress, department: $department, appointmentDate: $appointmentDate, appointmentTime: $appointmentTime, needPickup: $needPickup, pickupType: $pickupType, servicePrice: $servicePrice, pickupPrice: $pickupPrice, couponDiscount: $couponDiscount, totalPrice: $totalPrice, userNote: $userNote, status: $status, paidAt: $paidAt, acceptedAt: $acceptedAt, serviceStartedAt: $serviceStartedAt, serviceCompletedAt: $serviceCompletedAt, cancelledAt: $cancelledAt, cancelReason: $cancelReason, cancelledBy: $cancelledBy, refundAmount: $refundAmount, refundStatus: $refundStatus, createdAt: $createdAt, updatedAt: $updatedAt, companion: $companion, patient: $patient)';
+    return 'Order(id: $id, orderNo: $orderNo, userId: $userId, patientId: $patientId, orderType: $orderType, companionId: $companionId, institutionId: $institutionId, hospitalName: $hospitalName, hospitalAddress: $hospitalAddress, department: $department, appointmentDate: $appointmentDate, appointmentTime: $appointmentTime, needPickup: $needPickup, pickupType: $pickupType, servicePrice: $servicePrice, pickupPrice: $pickupPrice, couponDiscount: $couponDiscount, totalPrice: $totalPrice, userNote: $userNote, status: $status, paidAt: $paidAt, acceptedAt: $acceptedAt, serviceStartedAt: $serviceStartedAt, serviceCompletedAt: $serviceCompletedAt, cancelledAt: $cancelledAt, cancelReason: $cancelReason, cancelledBy: $cancelledBy, refundAmount: $refundAmount, refundStatus: $refundStatus, createdAt: $createdAt, updatedAt: $updatedAt, companion: $companion, institution: $institution, patient: $patient)';
   }
 
   @override
@@ -812,6 +843,8 @@ class _$OrderImpl implements _Order {
                 other.updatedAt == updatedAt) &&
             (identical(other.companion, companion) ||
                 other.companion == companion) &&
+            (identical(other.institution, institution) ||
+                other.institution == institution) &&
             (identical(other.patient, patient) || other.patient == patient));
   }
 
@@ -851,6 +884,7 @@ class _$OrderImpl implements _Order {
         createdAt,
         updatedAt,
         companion,
+        institution,
         patient
       ]);
 
@@ -915,6 +949,7 @@ abstract class _Order implements Order {
       @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson)
       final DateTime? updatedAt,
       final Companion? companion,
+      final Institution? institution,
       final Patient? patient}) = _$OrderImpl;
 
   factory _Order.fromJson(Map<String, dynamic> json) = _$OrderImpl.fromJson;
@@ -1012,6 +1047,8 @@ abstract class _Order implements Order {
   DateTime? get updatedAt;
   @override // 关联数据
   Companion? get companion;
+  @override
+  Institution? get institution;
   @override
   Patient? get patient;
   @override

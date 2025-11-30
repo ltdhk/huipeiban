@@ -6,6 +6,8 @@ part 'user.g.dart';
 /// 用户模型
 @freezed
 class User with _$User {
+  const User._();
+
   const factory User({
     required int id,
     String? phone,
@@ -13,6 +15,15 @@ class User with _$User {
     @JsonKey(name: 'avatar_url') String? avatarUrl,
     String? gender,
     @JsonKey(name: 'birth_date') DateTime? birthDate,
+    // 用户类型
+    @JsonKey(name: 'user_type', defaultValue: 'patient') @Default('patient') String userType,
+    // 陪诊师关联信息
+    @JsonKey(name: 'companion_id') int? companionId,
+    @JsonKey(name: 'companion_info') Map<String, dynamic>? companionInfo,
+    // 机构关联信息
+    @JsonKey(name: 'institution_id') int? institutionId,
+    @JsonKey(name: 'institution_info') Map<String, dynamic>? institutionInfo,
+    // 账户信息
     @Default(0.0) double balance,
     @Default(0) int points,
     @JsonKey(name: 'member_level') @Default('普通会员') String memberLevel,
@@ -24,6 +35,18 @@ class User with _$User {
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+
+  /// 是否为普通用户
+  bool get isPatient => userType == 'patient';
+
+  /// 是否为陪诊师
+  bool get isCompanion => userType == 'companion';
+
+  /// 是否为机构
+  bool get isInstitution => userType == 'institution';
+
+  /// 是否有陪诊管理权限
+  bool get hasCompanionManagement => isCompanion || isInstitution;
 }
 
 /// 认证响应

@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'companion.dart';
+import 'institution.dart';
 import 'patient.dart';
 
 part 'order.freezed.dart';
@@ -42,6 +43,7 @@ class Order with _$Order {
     @JsonKey(name: 'updated_at', fromJson: _dateTimeFromJson) DateTime? updatedAt,
     // 关联数据
     Companion? companion,
+    Institution? institution,
     Patient? patient,
   }) = _Order;
 

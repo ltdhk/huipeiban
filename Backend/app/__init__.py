@@ -56,6 +56,8 @@ def register_blueprints(app):
     from app.api.user.address import bp as address_bp
     from app.api.user.message import bp as message_bp
     from app.api.user.review import bp as review_bp
+    from app.api.user.service import bp as service_bp
+    from app.api.user.companion_order import bp as companion_order_bp
     from app.api.admin import admin_bp
 
     # 用户端 API
@@ -69,6 +71,8 @@ def register_blueprints(app):
     app.register_blueprint(address_bp)  # 地址接口（已包含 /api/v1/user/addresses 前缀）
     app.register_blueprint(message_bp)  # 消息接口（已包含 /api/v1/user/messages 前缀）
     app.register_blueprint(review_bp)  # 评价接口（已包含 /api/v1/user/reviews 前缀）
+    app.register_blueprint(service_bp)  # 服务接口（已包含 /api/v1/user/services 前缀）
+    app.register_blueprint(companion_order_bp)  # 陪诊师订单接口（已包含 /api/v1/companion/orders 前缀）
 
     # 管理端 API
     app.register_blueprint(admin_bp, url_prefix='/api/v1/admin')
@@ -97,7 +101,9 @@ def register_error_handlers(app):
     @app.errorhandler(500)
     def internal_error(e):
         app.logger.error(f'服务器内部错误: {e}')
-        return error_response(500, 'INTERNAL_ERROR', '服务器内部错误')
+        # 在开发环境显示详细错误信息
+        error_msg = str(e) if app.debug else '服务器内部错误'
+        return error_response(500, 'INTERNAL_ERROR', error_msg)
 
 
 def configure_logging(app):

@@ -205,89 +205,94 @@ class VoiceRecordingOverlay extends StatelessWidget {
     return Positioned.fill(
       child: Container(
         color: Colors.black.withValues(alpha: 0.6),
-        child: Center(
-          child: Container(
-            width: 280.w,
-            padding: EdgeInsets.all(24.w),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 状态指示
-                Container(
-                  width: 80.w,
-                  height: 80.w,
-                  decoration: BoxDecoration(
-                    color: isCancelling
-                        ? Colors.red.shade100
-                        : Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    isCancelling ? Icons.close : Icons.mic,
-                    size: 40.w,
-                    color: isCancelling ? Colors.red : Theme.of(context).primaryColor,
-                  ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              child: Container(
+                width: 280.w,
+                margin: EdgeInsets.symmetric(vertical: 24.h),
+                padding: EdgeInsets.all(24.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
-
-                SizedBox(height: 16.h),
-
-                // 状态文字
-                Text(
-                  isCancelling ? '松开取消发送' : '正在识别...',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: isCancelling ? Colors.red : Colors.black87,
-                  ),
-                ),
-
-                SizedBox(height: 8.h),
-
-                // 录音时长
-                Text(
-                  _formatDuration(recordingSeconds),
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-
-                // 识别的文字
-                if (recognizedText.isNotEmpty) ...[
-                  SizedBox(height: 16.h),
-                  Container(
-                    padding: EdgeInsets.all(12.w),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(8.r),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 状态指示
+                    Container(
+                      width: 80.w,
+                      height: 80.w,
+                      decoration: BoxDecoration(
+                        color: isCancelling
+                            ? Colors.red.shade100
+                            : Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isCancelling ? Icons.close : Icons.mic,
+                        size: 40.w,
+                        color: isCancelling ? Colors.red : Theme.of(context).primaryColor,
+                      ),
                     ),
-                    child: Text(
-                      recognizedText,
+
+                    SizedBox(height: 16.h),
+
+                    // 状态文字
+                    Text(
+                      isCancelling ? '松开取消发送' : '正在识别...',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: isCancelling ? Colors.red : Colors.black87,
+                      ),
+                    ),
+
+                    SizedBox(height: 8.h),
+
+                    // 录音时长
+                    Text(
+                      _formatDuration(recordingSeconds),
                       style: TextStyle(
                         fontSize: 14.sp,
-                        color: Colors.black87,
+                        color: Colors.grey.shade600,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
 
-                SizedBox(height: 16.h),
+                    // 识别的文字
+                    if (recognizedText.isNotEmpty) ...[
+                      SizedBox(height: 16.h),
+                      Container(
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Text(
+                          recognizedText,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
 
-                // 提示文字
-                Text(
-                  isCancelling ? '上滑取消' : '上滑可取消',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: Colors.grey.shade500,
-                  ),
+                    SizedBox(height: 16.h),
+
+                    // 提示文字
+                    Text(
+                      isCancelling ? '上滑取消' : '上滑可取消',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

@@ -231,17 +231,23 @@ def get_orders():
             if order.companion_id:
                 companion = Companion.query.get(order.companion_id)
                 if companion:
+                    # 从关联的 User 获取头像和电话
+                    user = companion.user
                     order_dict['companion'] = {
                         'id': companion.id,
+                        'user_id': companion.user_id,  # 用于即时通讯
                         'name': companion.name,
-                        'avatar_url': companion.avatar_url,
-                        'phone': companion.phone
+                        'avatar_url': user.avatar_url if user else None,
+                        'phone': user.phone if user else None,
+                        'rating': float(companion.rating) if companion.rating else 5.0,
+                        'service_years': companion.service_years
                     }
             elif order.institution_id:
                 institution = Institution.query.get(order.institution_id)
                 if institution:
                     order_dict['institution'] = {
                         'id': institution.id,
+                        'user_id': institution.user_id,  # 用于即时通讯
                         'name': institution.name,
                         'logo_url': institution.logo_url,
                         'phone': institution.phone

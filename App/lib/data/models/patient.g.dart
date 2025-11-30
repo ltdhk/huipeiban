@@ -8,14 +8,14 @@ part of 'patient.dart';
 
 _$PatientImpl _$$PatientImplFromJson(Map<String, dynamic> json) =>
     _$PatientImpl(
-      id: (json['id'] as num).toInt(),
-      userId: (json['user_id'] as num).toInt(),
-      name: json['name'] as String,
-      gender: json['gender'] as String,
+      id: json['id'] == null ? 0 : _intFromJson(json['id']),
+      userId: json['user_id'] == null ? 0 : _intFromJson(json['user_id']),
+      name: json['name'] as String? ?? '',
+      gender: json['gender'] as String? ?? '',
       birthDate: json['birth_date'] as String?,
       phone: json['phone'] as String?,
       idCard: json['id_card'] as String?,
-      relationship: json['relationship'] as String,
+      relationship: json['relationship'] as String? ?? '',
       medicalHistory: json['medical_history'] as String?,
       allergies: json['allergies'] as String?,
       specialNeeds: json['special_needs'] as String?,

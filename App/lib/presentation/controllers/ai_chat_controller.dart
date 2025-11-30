@@ -87,6 +87,7 @@ class AiChatController extends _$AiChatController {
         content: response.message,
         createdAt: response.createdAt ?? DateTime.now(),
         recommendations: response.recommendations,
+        institutionRecommendations: response.institutionRecommendations,
       );
 
       final updatedMessages = [...currentMessages, userMessage, assistantMessage];

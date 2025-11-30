@@ -3,22 +3,27 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../../app/theme.dart';
 import '../../../data/models/companion.dart';
+import '../../../data/models/institution.dart';
 import '../../../data/models/patient.dart';
 import '../../../data/models/service.dart';
 import '../../../data/repositories/patient_repository.dart';
 import '../../../data/repositories/companion_repository.dart';
-import '../payment/payment_page.dart';
+import '../../../data/repositories/order_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../controllers/ai_chat_controller.dart';
 
 /// 订单创建页面
 class CreateOrderPage extends StatefulWidget {
-  final Companion companion;
+  final Companion? companion;
+  final Institution? institution;
   final Map<String, dynamic>? aiContext; // AI 对话中收集的信息
 
   const CreateOrderPage({
     super.key,
-    required this.companion,
+    this.companion,
+    this.institution,
     this.aiContext,
-  });
+  }) : assert(companion != null || institution != null, '必须提供陪诊师或机构');
 
   @override
   State<CreateOrderPage> createState() => _CreateOrderPageState();
@@ -97,12 +102,20 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
 
   /// 从 API 加载服务包列表
   Future<void> _loadServices() async {
+    // 如果是机构订单，暂时跳过加载服务（机构有自己的服务列表）
+    if (widget.companion == null) {
+      setState(() {
+        _isLoadingServices = false;
+      });
+      return;
+    }
+
     try {
       setState(() {
         _isLoadingServices = true;
       });
 
-      final detail = await _companionRepository.getCompanionDetail(widget.companion.id);
+      final detail = await _companionRepository.getCompanionDetail(widget.companion!.id);
 
       setState(() {
         _services = detail.services;
@@ -337,8 +350,16 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
     );
   }
 
-  /// 构建陪诊师卡片
+  /// 构建陪诊师/机构卡片
   Widget _buildCompanionCard() {
+    // 判断是陪诊师还是机构
+    final isCompanion = widget.companion != null;
+    final name = isCompanion ? widget.companion!.name : widget.institution!.name;
+    final avatarUrl = isCompanion ? widget.companion!.avatarUrl : widget.institution!.logoUrl;
+    final rating = isCompanion ? widget.companion!.rating : widget.institution!.rating;
+    final completedOrders = isCompanion ? widget.companion!.completedOrders : widget.institution!.completedOrders;
+    final label = isCompanion ? '金牌陪诊师' : '认证机构';
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
@@ -347,21 +368,39 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
       ),
       child: Row(
         children: [
-          // 头像
-          CircleAvatar(
-            radius: 28.w,
-            backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
-            backgroundImage: widget.companion.avatarUrl != null &&
-                    (widget.companion.avatarUrl!.startsWith('http://') ||
-                        widget.companion.avatarUrl!.startsWith('https://'))
-                ? NetworkImage(widget.companion.avatarUrl!)
-                : null,
-            child: widget.companion.avatarUrl == null ||
-                    !(widget.companion.avatarUrl!.startsWith('http://') ||
-                        widget.companion.avatarUrl!.startsWith('https://'))
-                ? Icon(Icons.person, size: 28.w, color: AppTheme.primaryColor)
-                : null,
-          ),
+          // 头像/Logo
+          if (isCompanion)
+            CircleAvatar(
+              radius: 28.w,
+              backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
+              backgroundImage: avatarUrl != null &&
+                      (avatarUrl.startsWith('http://') ||
+                          avatarUrl.startsWith('https://'))
+                  ? NetworkImage(avatarUrl)
+                  : null,
+              child: avatarUrl == null ||
+                      !(avatarUrl.startsWith('http://') ||
+                          avatarUrl.startsWith('https://'))
+                  ? Icon(Icons.person, size: 28.w, color: AppTheme.primaryColor)
+                  : null,
+            )
+          else
+            Container(
+              width: 56.w,
+              height: 56.w,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: avatarUrl != null &&
+                      (avatarUrl.startsWith('http://') ||
+                          avatarUrl.startsWith('https://'))
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: Image.network(avatarUrl, fit: BoxFit.cover),
+                    )
+                  : Icon(Icons.business, size: 28.w, color: AppTheme.primaryColor),
+            ),
           SizedBox(width: 12.w),
 
           // 信息
@@ -372,7 +411,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                 Row(
                   children: [
                     Text(
-                      widget.companion.name,
+                      name,
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
@@ -385,11 +424,11 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                         vertical: 2.h,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withOpacity(0.1),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(4.r),
                       ),
                       child: Text(
-                        '金牌陪诊师',
+                        label,
                         style: TextStyle(
                           fontSize: 10.sp,
                           color: AppTheme.primaryColor,
@@ -404,7 +443,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                     Icon(Icons.star, size: 14.w, color: Colors.amber),
                     SizedBox(width: 4.w),
                     Text(
-                      widget.companion.rating.toStringAsFixed(1),
+                      rating.toStringAsFixed(1),
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.w500,
@@ -412,7 +451,7 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
                     ),
                     SizedBox(width: 12.w),
                     Text(
-                      '(${widget.companion.completedOrders}次服务)',
+                      '(${completedOrders}次服务)',
                       style: TextStyle(
                         fontSize: 12.sp,
                         color: AppTheme.textSecondary,
@@ -819,12 +858,12 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
 
     if (result == true) {
       try {
-        final patient = await _patientRepository.createPatient(
-          name: nameController.text,
-          gender: selectedGender,
-          phone: phoneController.text.isEmpty ? null : phoneController.text,
-          relationship: selectedRelationship,
-        );
+        await _patientRepository.createPatient({
+          'name': nameController.text,
+          'gender': selectedGender,
+          if (phoneController.text.isNotEmpty) 'phone': phoneController.text,
+          'relationship': selectedRelationship,
+        });
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1196,8 +1235,8 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
     );
   }
 
-  /// 处理创建订单
-  void _handleCreateOrder() {
+  /// 处理创建订单 - 直接创建预约订单，跳过支付
+  Future<void> _handleCreateOrder() async {
     // 验证必填项
     if (_selectedPatient == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1206,7 +1245,8 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
       return;
     }
 
-    if (_selectedServiceSpec == null) {
+    // 机构订单可以不选服务规格
+    if (widget.companion != null && _selectedServiceSpec == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('请选择服务套餐')),
       );
@@ -1235,29 +1275,96 @@ class _CreateOrderPageState extends State<CreateOrderPage> {
     }
 
     // 计算价格
-    final servicePrice = _selectedServiceSpec!.price;
+    final servicePrice = _selectedServiceSpec?.price ?? 200.0; // 默认价格
     final pickupPrice = _selectedPickup != 'none' ? 50.0 : 0.0; // 接送费用固定50元
+    final totalPrice = servicePrice + pickupPrice;
 
     // 格式化预约时间
     final appointmentTimeStr = '${_appointmentTime!.hour.toString().padLeft(2, '0')}:${_appointmentTime!.minute.toString().padLeft(2, '0')}';
 
-    // 跳转到支付页面
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PaymentPage(
-          hospitalName: _hospitalName!,
-          department: _department,
-          appointmentDate: _appointmentDate!,
-          appointmentTime: appointmentTimeStr,
-          serviceSpec: _selectedServiceSpec!,
-          needPickup: _selectedPickup != 'none',
-          companion: widget.companion,
-          patient: _selectedPatient!,
-          servicePrice: servicePrice,
-          pickupPrice: pickupPrice,
+    // 显示加载对话框
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: Container(
+          padding: EdgeInsets.all(24.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              SizedBox(height: 16.h),
+              Text(
+                '正在创建预约订单...',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+
+    try {
+      final orderRepository = OrderRepository();
+
+      // 判断订单类型
+      final isCompanion = widget.companion != null;
+      final orderType = isCompanion ? 'companion' : 'institution';
+
+      // 调用后端 API 创建订单
+      final result = await orderRepository.createOrder(
+        patientId: _selectedPatient!.id,
+        orderType: orderType,
+        companionId: isCompanion ? widget.companion!.id : null,
+        institutionId: !isCompanion ? widget.institution!.id : null,
+        serviceSpecId: _selectedServiceSpec?.id,
+        hospitalName: _hospitalName!,
+        department: _department,
+        appointmentDate: _appointmentDate!,
+        appointmentTime: appointmentTimeStr,
+        needPickup: _selectedPickup != 'none',
+        servicePrice: servicePrice,
+        pickupPrice: pickupPrice,
+      );
+
+      // 获取订单信息
+      final orderId = result['order_id'] as int;
+      final orderNo = result['order_no'] as String;
+
+      // 关闭加载对话框
+      if (mounted) {
+        Navigator.of(context).pop();
+
+        // 跳转到预约成功页面，传入 orderId 用于后续获取完整订单数据
+        Navigator.of(context).pushReplacementNamed(
+          '/booking-success',
+          arguments: {
+            'orderId': orderId,
+            'orderNo': orderNo,
+            'amount': totalPrice,
+          },
+        );
+      }
+    } catch (e) {
+      // 关闭加载对话框
+      if (mounted) {
+        Navigator.of(context).pop();
+
+        // 显示错误提示
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('创建订单失败: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

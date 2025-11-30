@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 消息/会话管理API - 用户端
+
+简化设计：
+- 会话只需要指定对方用户ID（target_user_id）
+- 所有用户ID都统一使用 users 表
 """
 from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity
@@ -8,13 +12,25 @@ from datetime import datetime
 from sqlalchemy import or_, and_
 
 from app.models.message import Conversation, Message
-from app.models.companion import Companion
 from app.models.user import User
 from app.utils.decorators import login_required
 from app.utils.response import success_response, error_response
 from app.extensions import db
 
 bp = Blueprint('user_message', __name__, url_prefix='/api/v1/user/messages')
+
+
+def _get_user_info(user_id):
+    """获取用户基本信息"""
+    user = User.query.get(user_id)
+    if not user:
+        return None
+    return {
+        'id': user.id,
+        'nickname': user.nickname,
+        'avatar_url': user.avatar_url,
+        'user_type': user.user_type
+    }
 
 
 @bp.route('/conversations', methods=['GET'])
@@ -39,36 +55,24 @@ def get_conversations():
     }
     """
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         page = request.args.get('page', 1, type=int)
         page_size = request.args.get('page_size', 20, type=int)
         page_size = min(page_size, 100)
 
-        # 查询用户的会话列表
-        query = Conversation.query.filter_by(
-            user_id=current_user_id,
-            status='active'
-        ).order_by(Conversation.updated_at.desc())
-
+        # 查询用户参与的所有会话
+        query = Conversation.get_user_conversations(current_user_id)
         pagination = query.paginate(page=page, per_page=page_size, error_out=False)
 
         # 转换为字典并添加对方信息
         conversations = []
         for conv in pagination.items:
-            conv_dict = conv.to_dict()
-
-            # 添加对方信息（陪诊师或机构）
-            if conv.companion_id:
-                companion = Companion.query.get(conv.companion_id)
-                if companion:
-                    conv_dict['other_party'] = {
-                        'id': companion.id,
-                        'type': 'companion',
-                        'name': companion.name,
-                        'avatar_url': companion.avatar_url
-                    }
-            # TODO: 添加机构信息处理
-
+            conv_dict = conv.to_dict(current_user_id)
+            # 添加对方用户信息
+            other_user_id = conv.get_other_user_id(current_user_id)
+            other_user = _get_user_info(other_user_id)
+            if other_user:
+                conv_dict['other_party'] = other_user
             conversations.append(conv_dict)
 
         return success_response({
@@ -80,10 +84,10 @@ def get_conversations():
         }, '获取会话列表成功')
 
     except Exception as e:
-        return error_response(f'获取会话列表失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'获取会话列表失败: {str(e)}')
 
 
-@bp.route('/conversations/<int:conversation_id>', methods=['GET'])
+@bp.route('/conversations/<conversation_id>', methods=['GET'])
 @login_required()
 def get_conversation_messages(conversation_id):
     """
@@ -107,16 +111,19 @@ def get_conversation_messages(conversation_id):
         }
     }
     """
+    # 将字符串转换为整数（支持大整数ID）
     try:
-        current_user_id = get_jwt_identity()
-        # 验证会话权限
-        conversation = Conversation.query.filter_by(
-            id=conversation_id,
-            user_id=current_user_id
-        ).first()
+        conversation_id = int(conversation_id)
+    except ValueError:
+        return error_response(400, 'BAD_REQUEST', '无效的会话ID')
 
-        if not conversation:
-            return error_response('会话不存在', 404)
+    try:
+        current_user_id = int(get_jwt_identity())
+
+        # 验证会话权限（用户必须是会话参与者）
+        conversation = Conversation.query.get(conversation_id)
+        if not conversation or not conversation.is_participant(current_user_id):
+            return error_response(404, 'NOT_FOUND', '会话不存在')
 
         page = request.args.get('page', 1, type=int)
         page_size = request.args.get('page_size', 50, type=int)
@@ -137,12 +144,14 @@ def get_conversation_messages(conversation_id):
             is_read=False
         ).update({'is_read': True})
 
-        # 更新会话未读数
-        conversation.unread_count = 0
+        # 清除当前用户的未读数
+        conversation.clear_unread(current_user_id)
         db.session.commit()
 
+        messages_list = [msg.to_dict() for msg in reversed(pagination.items)]
+
         return success_response({
-            'list': [msg.to_dict() for msg in reversed(pagination.items)],  # 反转，最早的在前
+            'list': messages_list,
             'total': pagination.total,
             'page': page,
             'page_size': page_size,
@@ -151,10 +160,10 @@ def get_conversation_messages(conversation_id):
 
     except Exception as e:
         db.session.rollback()
-        return error_response(f'获取消息列表失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'获取消息列表失败: {str(e)}')
 
 
-@bp.route('/conversations/<int:conversation_id>/messages', methods=['POST'])
+@bp.route('/conversations/<conversation_id>/messages', methods=['POST'])
 @login_required()
 def send_message(conversation_id):
     """
@@ -180,33 +189,33 @@ def send_message(conversation_id):
         "message": "发送成功"
     }
     """
+    # 将字符串转换为整数（支持大整数ID）
     try:
-        current_user_id = get_jwt_identity()
-        # 验证会话权限
-        conversation = Conversation.query.filter_by(
-            id=conversation_id,
-            user_id=current_user_id
-        ).first()
+        conversation_id = int(conversation_id)
+    except ValueError:
+        return error_response(400, 'BAD_REQUEST', '无效的会话ID')
 
-        if not conversation:
-            return error_response('会话不存在', 404)
+    try:
+        current_user_id = int(get_jwt_identity())
+
+        # 验证会话权限
+        conversation = Conversation.query.get(conversation_id)
+        if not conversation or not conversation.is_participant(current_user_id):
+            return error_response(404, 'NOT_FOUND', '会话不存在')
 
         data = request.get_json()
 
         if 'content' not in data:
-            return error_response('缺少必填字段: content', 400)
+            return error_response(400, 'BAD_REQUEST', '缺少必填字段: content')
 
-        # 确定接收者
-        receiver_id = conversation.companion_id or conversation.institution_id
-        receiver_type = 'companion' if conversation.companion_id else 'institution'
+        # 确定接收者（对方用户）
+        receiver_id = conversation.get_other_user_id(current_user_id)
 
         # 创建消息
         message = Message(
             conversation_id=conversation_id,
             sender_id=current_user_id,
-            sender_type='user',
             receiver_id=receiver_id,
-            receiver_type=receiver_type,
             content_type=data.get('content_type', 'text'),
             content=data['content']
         )
@@ -214,8 +223,12 @@ def send_message(conversation_id):
         db.session.add(message)
 
         # 更新会话信息
-        conversation.last_message = data['content']
-        conversation.updated_at = datetime.utcnow()
+        now = datetime.utcnow()
+        conversation.last_message = data['content'] if data.get('content_type', 'text') == 'text' else f"[{data.get('content_type')}]"
+        conversation.last_message_at = now
+        conversation.updated_at = now
+        # 增加接收者的未读数
+        conversation.increment_unread(receiver_id)
 
         db.session.commit()
 
@@ -223,7 +236,7 @@ def send_message(conversation_id):
 
     except Exception as e:
         db.session.rollback()
-        return error_response(f'发送失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'发送失败: {str(e)}')
 
 
 @bp.route('/conversations', methods=['POST'])
@@ -234,8 +247,7 @@ def create_conversation():
 
     请求体:
     {
-        "companion_id": 1,  // 或 institution_id
-        "title": "会话标题"
+        "target_user_id": 123  // 对方用户ID
     }
 
     响应:
@@ -249,46 +261,58 @@ def create_conversation():
     }
     """
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         data = request.get_json()
 
         # 验证参数
-        companion_id = data.get('companion_id')
-        institution_id = data.get('institution_id')
+        target_user_id = data.get('target_user_id')
+        if not target_user_id:
+            return error_response(400, 'BAD_REQUEST', '必须指定 target_user_id')
 
-        if not companion_id and not institution_id:
-            return error_response('必须指定 companion_id 或 institution_id', 400)
+        target_user_id = int(target_user_id)
 
-        # 检查是否已存在会话
-        existing = Conversation.query.filter_by(
-            user_id=current_user_id,
-            companion_id=companion_id,
-            institution_id=institution_id,
-            status='active'
-        ).first()
+        # 不能与自己创建会话
+        if target_user_id == current_user_id:
+            return error_response(400, 'BAD_REQUEST', '不能与自己创建会话')
 
+        # 验证目标用户存在
+        target_user = User.query.get(target_user_id)
+        if not target_user:
+            return error_response(404, 'NOT_FOUND', '目标用户不存在')
+
+        # 检查是否已存在会话（不区分顺序）
+        existing = Conversation.find_by_users(current_user_id, target_user_id)
         if existing:
-            return success_response(existing.to_dict(), '会话已存在')
+            conv_dict = existing.to_dict(current_user_id)
+            # 添加对方信息
+            other_user = _get_user_info(target_user_id)
+            if other_user:
+                conv_dict['other_party'] = other_user
+            return success_response(conv_dict, '会话已存在')
 
         # 创建新会话
         conversation = Conversation(
-            user_id=current_user_id,
-            companion_id=companion_id,
-            institution_id=institution_id,
-            title=data.get('title', '新会话')
+            user1_id=current_user_id,
+            user2_id=target_user_id
         )
 
         db.session.add(conversation)
         db.session.commit()
 
-        return success_response(conversation.to_dict(), '创建成功')
+        conv_dict = conversation.to_dict(current_user_id)
+        # 添加对方信息
+        other_user = _get_user_info(target_user_id)
+        if other_user:
+            conv_dict['other_party'] = other_user
+
+        return success_response(conv_dict, '创建成功')
 
     except Exception as e:
         db.session.rollback()
-        return error_response(f'创建失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'创建失败: {str(e)}')
 
 
-@bp.route('/conversations/<int:conversation_id>', methods=['DELETE'])
+@bp.route('/conversations/<conversation_id>', methods=['DELETE'])
 @login_required()
 def delete_conversation(conversation_id):
     """
@@ -303,15 +327,18 @@ def delete_conversation(conversation_id):
         "message": "删除成功"
     }
     """
+    # 将字符串转换为整数（支持大整数ID）
     try:
-        current_user_id = get_jwt_identity()
-        conversation = Conversation.query.filter_by(
-            id=conversation_id,
-            user_id=current_user_id
-        ).first()
+        conversation_id = int(conversation_id)
+    except ValueError:
+        return error_response(400, 'BAD_REQUEST', '无效的会话ID')
 
-        if not conversation:
-            return error_response('会话不存在', 404)
+    try:
+        current_user_id = int(get_jwt_identity())
+
+        conversation = Conversation.query.get(conversation_id)
+        if not conversation or not conversation.is_participant(current_user_id):
+            return error_response(404, 'NOT_FOUND', '会话不存在')
 
         # 归档会话
         conversation.status = 'archived'
@@ -322,7 +349,7 @@ def delete_conversation(conversation_id):
 
     except Exception as e:
         db.session.rollback()
-        return error_response(f'删除失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'删除失败: {str(e)}')
 
 
 @bp.route('/unread-count', methods=['GET'])
@@ -340,18 +367,33 @@ def get_unread_count():
     }
     """
     try:
-        current_user_id = get_jwt_identity()
-        # 统计未读消息数
-        total_unread = db.session.query(
-            db.func.sum(Conversation.unread_count)
-        ).filter_by(
-            user_id=current_user_id,
-            status='active'
+        current_user_id = int(get_jwt_identity())
+
+        # 统计用户在所有会话中的未读数
+        # 需要分别查询 user1_unread 和 user2_unread
+        total_unread = 0
+
+        # 作为 user1 的会话
+        unread_as_user1 = db.session.query(
+            db.func.coalesce(db.func.sum(Conversation.user1_unread), 0)
+        ).filter(
+            Conversation.user1_id == current_user_id,
+            Conversation.status == 'active'
         ).scalar() or 0
 
+        # 作为 user2 的会话
+        unread_as_user2 = db.session.query(
+            db.func.coalesce(db.func.sum(Conversation.user2_unread), 0)
+        ).filter(
+            Conversation.user2_id == current_user_id,
+            Conversation.status == 'active'
+        ).scalar() or 0
+
+        total_unread = int(unread_as_user1) + int(unread_as_user2)
+
         return success_response({
-            'count': int(total_unread)
+            'count': total_unread
         }, '获取成功')
 
     except Exception as e:
-        return error_response(f'获取失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'获取失败: {str(e)}')

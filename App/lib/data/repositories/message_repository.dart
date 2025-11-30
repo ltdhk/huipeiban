@@ -74,12 +74,13 @@ class MessageRepository {
     }
   }
 
-  Future<Conversation> createConversation({int? companionId, int? institutionId, String? title}) async {
+  /// 创建会话
+  ///
+  /// [targetUserId] 对方用户ID（统一使用 users 表的 ID）
+  Future<Conversation> createConversation({required int targetUserId}) async {
     try {
       final response = await _dio.post(ApiConstants.conversations, data: {
-        'companion_id': companionId,
-        'institution_id': institutionId,
-        'title': title,
+        'target_user_id': targetUserId,
       });
       final apiResp = ApiResponse<Conversation>.fromJson(
         response.data,

@@ -19,8 +19,14 @@ export const createWsServer = (server: http.Server) => {
 
   const broadcast = (userId: number, payload: WsOutbound) => {
     const clients = sessions.get(userId);
+    console.log(`[WS] broadcast to userId=${userId}, online clients=${clients?.size ?? 0}, all sessions:`, Array.from(sessions.keys()));
+    if (!clients || clients.size === 0) {
+      console.log(`[WS] 用户 ${userId} 当前不在线，无法推送实时消息`);
+      return;
+    }
     clients?.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {
+        console.log(`[WS] 推送消息给用户 ${userId}`);
         client.send(JSON.stringify(payload));
       }
     });
@@ -50,15 +56,20 @@ export const createWsServer = (server: http.Server) => {
             sessions.set(user.id, set);
           }
           set.add(ws);
+          console.log(`[WS] 用户 ${user.id} 认证成功，当前在线用户:`, Array.from(sessions.keys()));
           return push(ws, { type: 'auth_ok', userId: user.id, role: user.role });
         }
 
         if (msg.type === 'send') {
+          console.log(`[WS] 用户 ${user!.id} 发送消息到会话 ${msg.data.convId}`);
           const conv = await fetchConversation(msg.data.convId);
+          console.log(`[WS] 会话信息: user1_id=${conv.user1_id}, user2_id=${conv.user2_id}`);
           const message = await appendMessage(conv, user!, msg.data.content, msg.data.contentType ?? 'text');
+          console.log(`[WS] 消息已保存: id=${message.id}, sender=${message.sender_id}, receiver=${message.receiver_id}`);
           push(ws, { type: 'ack', tempId: msg.data.tempId, message });
 
           const { receiverId } = resolveReceiver(conv, user!);
+          console.log(`[WS] 准备广播给接收者: receiverId=${receiverId}`);
           broadcast(receiverId, { type: 'message', data: message });
           if (receiverId !== user!.id) {
             // also push to other logged-in sessions of sender

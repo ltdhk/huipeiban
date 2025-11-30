@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../models/ai_chat.dart';
 import '../providers/ai_api_provider.dart';
 import '../../core/network/dio_client.dart';
@@ -5,25 +6,37 @@ import '../../core/network/dio_client.dart';
 /// AI Repository
 class AiRepository {
   late final AiApiProvider _apiProvider;
+  late final Dio _dio;
 
   AiRepository() {
-    _apiProvider = AiApiProvider(DioClient().dio);
+    _dio = DioClient().dio;
+    _apiProvider = AiApiProvider(_dio);
   }
 
   /// 发送聊天消息
+  /// AI 聊天需要更长的超时时间(120秒)
   Future<AiChatResponse> chat({
     required String message,
     String? sessionId,
   }) async {
-    final response = await _apiProvider.chat({
-      'message': message,
-      if (sessionId != null) 'session_id': sessionId,
-    });
+    // 临时修改请求的超时时间
+    final originalReceiveTimeout = _dio.options.receiveTimeout;
+    _dio.options.receiveTimeout = const Duration(seconds: 120);
 
-    if (response.success && response.data != null) {
-      return response.data!;
-    } else {
-      throw Exception(response.message ?? 'AI 聊天失败');
+    try {
+      final response = await _apiProvider.chat({
+        'message': message,
+        if (sessionId != null) 'session_id': sessionId,
+      });
+
+      if (response.success && response.data != null) {
+        return response.data!;
+      } else {
+        throw Exception(response.message ?? 'AI 聊天失败');
+      }
+    } finally {
+      // 恢复原始超时时间
+      _dio.options.receiveTimeout = originalReceiveTimeout;
     }
   }
 

@@ -15,6 +15,11 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       birthDate: json['birth_date'] == null
           ? null
           : DateTime.parse(json['birth_date'] as String),
+      userType: json['user_type'] as String? ?? 'patient',
+      companionId: (json['companion_id'] as num?)?.toInt(),
+      companionInfo: json['companion_info'] as Map<String, dynamic>?,
+      institutionId: (json['institution_id'] as num?)?.toInt(),
+      institutionInfo: json['institution_info'] as Map<String, dynamic>?,
       balance: (json['balance'] as num?)?.toDouble() ?? 0.0,
       points: (json['points'] as num?)?.toInt() ?? 0,
       memberLevel: json['member_level'] as String? ?? '普通会员',
@@ -37,6 +42,11 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'avatar_url': instance.avatarUrl,
       'gender': instance.gender,
       'birth_date': instance.birthDate?.toIso8601String(),
+      'user_type': instance.userType,
+      'companion_id': instance.companionId,
+      'companion_info': instance.companionInfo,
+      'institution_id': instance.institutionId,
+      'institution_info': instance.institutionInfo,
       'balance': instance.balance,
       'points': instance.points,
       'member_level': instance.memberLevel,

@@ -65,9 +65,14 @@ class ChatSocketService {
   void _handleMessage(dynamic raw) {
     try {
       final data = jsonDecode(raw as String) as Map<String, dynamic>;
+      _logger.d('收到 IM 消息: ${data['type']}');
       if (data['type'] == 'auth_ok') {
         _authOk = true;
         _logger.i('IM 认证成功: ${data['userId']}');
+      } else if (data['type'] == 'message') {
+        _logger.i('收到新消息: ${data['data']}');
+      } else if (data['type'] == 'ack') {
+        _logger.i('消息发送确认: ${data['tempId']}');
       }
       _incomingController.add(data);
     } catch (e) {

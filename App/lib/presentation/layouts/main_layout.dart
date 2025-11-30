@@ -8,6 +8,7 @@ import '../pages/home/home_page.dart';
 import '../pages/orders/orders_page.dart';
 import '../pages/messages/messages_page.dart';
 import '../pages/profile/profile_page.dart';
+import '../pages/companion/companion_management_page.dart';
 
 /// 主布局 - 带侧边栏导航
 class MainLayout extends ConsumerStatefulWidget {
@@ -37,6 +38,7 @@ class _MainLayoutState extends ConsumerState<MainLayout>
     OrdersPage(onMenuTap: _toggleSidebar),    // 订单
     MessagesPage(onMenuTap: _toggleSidebar),  // 消息
     ProfilePage(onMenuTap: _toggleSidebar),   // 个人中心
+    CompanionManagementPage(onMenuTap: _toggleSidebar), // 陪诊管理
   ];
 
   @override
@@ -124,7 +126,7 @@ class _MainLayoutState extends ConsumerState<MainLayout>
         gradient: AppTheme.primaryGradient,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(2, 0),
           ),
@@ -183,7 +185,7 @@ class _MainLayoutState extends ConsumerState<MainLayout>
           '智能陪诊，贴心服务',
           style: TextStyle(
             fontSize: 12.sp,
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
           ),
         ),
       ],
@@ -196,7 +198,7 @@ class _MainLayoutState extends ConsumerState<MainLayout>
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
@@ -242,7 +244,7 @@ class _MainLayoutState extends ConsumerState<MainLayout>
                   user?.phone ?? '',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -255,6 +257,9 @@ class _MainLayoutState extends ConsumerState<MainLayout>
 
   /// 构建导航菜单
   Widget _buildNavMenu() {
+    final authState = ref.watch(authControllerProvider);
+    final user = authState.value;
+
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       children: [
@@ -281,6 +286,17 @@ class _MainLayoutState extends ConsumerState<MainLayout>
           label: '个人中心',
           index: 3,
         ),
+
+        // 陪诊管理入口 - 仅陪诊师和机构可见
+        if (user?.hasCompanionManagement == true) ...[
+          SizedBox(height: 16.h),
+          Divider(
+            color: Colors.white.withValues(alpha: 0.3),
+            thickness: 1,
+          ),
+          SizedBox(height: 16.h),
+          _buildCompanionManagementItem(user),
+        ],
       ],
     );
   }
@@ -313,7 +329,7 @@ class _MainLayoutState extends ConsumerState<MainLayout>
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? Colors.white.withOpacity(0.3)
+                ? Colors.white.withValues(alpha: 0.3)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12.r),
           ),
@@ -340,6 +356,82 @@ class _MainLayoutState extends ConsumerState<MainLayout>
     );
   }
 
+  /// 构建陪诊管理入口
+  Widget _buildCompanionManagementItem(dynamic user) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _selectedIndex = 4; // 陪诊管理页面索引
+            // 切换页面时自动关闭侧边栏
+            if (_isSidebarOpen) {
+              _toggleSidebar();
+            }
+          });
+        },
+        borderRadius: BorderRadius.circular(12.r),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 16.h,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.25),
+                Colors.white.withValues(alpha: 0.15),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.business_center,
+                size: 24.w,
+                color: Colors.white,
+              ),
+              SizedBox(width: 16.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '陪诊管理',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      user?.isCompanion == true ? '服务·时间·订单' : '机构管理',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.white.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16.w,
+                color: Colors.white.withValues(alpha: 0.6),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   /// 构建退出按钮
   Widget _buildLogoutButton() {
     return Padding(
@@ -355,7 +447,7 @@ class _MainLayoutState extends ConsumerState<MainLayout>
               vertical: 16.h,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Row(

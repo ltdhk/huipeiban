@@ -3,12 +3,54 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'companion.freezed.dart';
 part 'companion.g.dart';
 
+// 自定义 JSON 转换函数
+double _doubleFromJson(dynamic value) {
+  if (value == null) return 5.0;
+  if (value is num) return value.toDouble();
+  if (value is String) {
+    try {
+      return double.parse(value);
+    } catch (e) {
+      return 5.0;
+    }
+  }
+  return 5.0;
+}
+
+int _intFromJson(dynamic value) {
+  if (value == null) return 0;
+  if (value is num) return value.toInt();
+  if (value is String) {
+    try {
+      return int.parse(value);
+    } catch (e) {
+      return 0;
+    }
+  }
+  return 0;
+}
+
+int? _intFromJsonNullable(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value.toInt();
+  if (value is String) {
+    try {
+      return int.parse(value);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}
+
 /// 陪诊师模型
 @freezed
 class Companion with _$Companion {
   const factory Companion({
-    required int id,
-    required String name,
+    @Default(0) int id,
+    /// 关联的用户ID（用于即时通讯）
+    @JsonKey(name: 'user_id') int? userId,
+    @Default('') String name,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
     String? gender,
     int? age,
@@ -33,20 +75,6 @@ class Companion with _$Companion {
 
   factory Companion.fromJson(Map<String, dynamic> json) =>
       _$CompanionFromJson(json);
-}
-
-// 自定义 JSON 转换函数
-double _doubleFromJson(dynamic value) {
-  if (value == null) return 5.0;
-  if (value is num) return value.toDouble();
-  if (value is String) {
-    try {
-      return double.parse(value);
-    } catch (e) {
-      return 5.0;
-    }
-  }
-  return 5.0;
 }
 
 /// 陪诊师推荐响应 (从 AI 返回)

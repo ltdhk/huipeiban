@@ -51,6 +51,9 @@ dependencies:
   # 图片处理
   image_picker: ^1.0.7
 
+  # URL 启动器（拨打电话、发送短信等）
+  url_launcher: ^6.2.4
+
   # 位置服务 (地址选择)
   geolocator: ^11.0.0
   geocoding: ^3.0.0

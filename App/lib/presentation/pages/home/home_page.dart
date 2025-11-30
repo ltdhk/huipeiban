@@ -5,6 +5,7 @@ import 'dart:async';
 import '../../../app/theme.dart';
 import '../../../data/models/ai_chat.dart';
 import '../../../data/models/companion.dart';
+import '../../../data/models/institution.dart';
 import '../../../data/models/order.dart';
 import '../../../data/models/patient.dart';
 import '../../controllers/ai_chat_controller.dart';
@@ -412,10 +413,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ),
                         ),
                 ),
-                // 推荐卡片
+                // 陪诊师推荐卡片
                 if (message.recommendations != null &&
                     message.recommendations!.isNotEmpty)
-                  _buildRecommendations(message.recommendations!),
+                  _buildCompanionRecommendations(message.recommendations!),
+                // 机构推荐卡片
+                if (message.institutionRecommendations != null &&
+                    message.institutionRecommendations!.isNotEmpty)
+                  _buildInstitutionRecommendations(message.institutionRecommendations!),
               ],
             ),
           ),
@@ -470,8 +475,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  /// 构建推荐卡片
-  Widget _buildRecommendations(List<dynamic> recommendations) {
+  /// 构建陪诊师推荐卡片
+  Widget _buildCompanionRecommendations(List<dynamic> recommendations) {
     return Container(
       margin: EdgeInsets.only(top: 8.h),
       child: Column(
@@ -644,6 +649,209 @@ class _HomePageState extends ConsumerState<HomePage> {
                         MaterialPageRoute(
                           builder: (context) => CreateOrderPage(
                             companion: companion,
+                            aiContext: collectedInfo ?? {
+                              // 默认值（如果 AI 没有收集到信息）
+                              'hospital': '北京协和医院',
+                              'date': DateTime.now().add(const Duration(days: 1)).toIso8601String(),
+                              'time': '09:30',
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(64.w, 32.h),
+                      padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
+                    ),
+                    child: Text(
+                      '预约',
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  /// 构建机构推荐卡片
+  Widget _buildInstitutionRecommendations(List<Institution> institutions) {
+    return Container(
+      margin: EdgeInsets.only(top: 8.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '推荐陪诊机构',
+            style: TextStyle(
+              fontSize: 12.sp,
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          ...institutions.take(3).map((institution) {
+            return Container(
+              margin: EdgeInsets.only(bottom: 8.h),
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: AppTheme.dividerColor),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Logo
+                  Container(
+                    width: 48.w,
+                    height: 48.w,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: institution.logoUrl != null &&
+                            (institution.logoUrl!.startsWith('http://') ||
+                                institution.logoUrl!.startsWith('https://'))
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8.r),
+                            child: Image.network(
+                              institution.logoUrl!,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Icon(
+                            Icons.business,
+                            color: AppTheme.primaryColor,
+                            size: 24.w,
+                          ),
+                  ),
+                  SizedBox(width: 12.w),
+
+                  // 信息区域
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 机构名称和认证标识
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                institution.name,
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.textPrimary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (institution.isVerified) ...[
+                              SizedBox(width: 4.w),
+                              Icon(
+                                Icons.verified,
+                                size: 14.w,
+                                color: AppTheme.primaryColor,
+                              ),
+                            ],
+                          ],
+                        ),
+                        SizedBox(height: 4.h),
+
+                        // 评分和服务次数
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              size: 14.w,
+                              color: Colors.amber,
+                            ),
+                            SizedBox(width: 2.w),
+                            Text(
+                              institution.rating.toStringAsFixed(1),
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: AppTheme.textPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              '${institution.completedOrders}单',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              '${institution.companionCount}名陪诊师',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 4.h),
+
+                        // 服务区域
+                        if (institution.city != null)
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 12.w,
+                                color: AppTheme.textSecondary,
+                              ),
+                              SizedBox(width: 2.w),
+                              Text(
+                                institution.city!,
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(width: 8.w),
+
+                  // 预约按钮
+                  ElevatedButton(
+                    onPressed: () {
+                      // 从 AI 控制器获取收集的信息
+                      final collectedInfo = ref.read(aiChatControllerProvider.notifier).latestCollectedInfo;
+
+                      debugPrint('机构预约按钮点击 - 从AI收集到的信息: $collectedInfo');
+
+                      // 跳转到机构订单创建页面
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CreateOrderPage(
+                            institution: institution,
                             aiContext: collectedInfo ?? {
                               // 默认值（如果 AI 没有收集到信息）
                               'hospital': '北京协和医院',

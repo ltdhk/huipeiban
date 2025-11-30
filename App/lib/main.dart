@@ -8,6 +8,11 @@ import 'presentation/pages/auth/login_page.dart';
 import 'presentation/layouts/main_layout.dart';
 import 'presentation/controllers/auth_controller.dart';
 import 'presentation/pages/payment/payment_success_page.dart';
+import 'presentation/pages/payment/booking_success_page.dart';
+import 'presentation/pages/profile/patients_page.dart';
+import 'presentation/pages/profile/favorites_page.dart';
+import 'presentation/pages/profile/help_page.dart';
+import 'presentation/pages/profile/about_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +45,10 @@ class CareLinkApp extends StatelessWidget {
           routes: {
             '/login': (context) => const LoginPage(),
             '/home': (context) => const MainLayout(),
+            '/patients': (context) => const PatientsPage(),
+            '/favorites': (context) => const FavoritesPage(),
+            '/help': (context) => const HelpPage(),
+            '/about': (context) => const AboutPage(),
           },
           onGenerateRoute: (settings) {
             // 处理带参数的路由
@@ -56,6 +65,17 @@ class CareLinkApp extends StatelessWidget {
                   orderNo: args?['orderNo'] ?? '',
                   amount: args?['amount'] ?? 0.0,
                   paymentMethod: args?['paymentMethod'] ?? 'wechat',
+                  orderDetails: args?['orderDetails'] as Map<String, dynamic>?,
+                ),
+              );
+            }
+            if (settings.name == '/booking-success') {
+              final args = settings.arguments as Map<String, dynamic>?;
+              return MaterialPageRoute(
+                builder: (context) => BookingSuccessPage(
+                  orderId: args?['orderId'] as int?,
+                  orderNo: args?['orderNo'] ?? '',
+                  amount: args?['amount'] ?? 0.0,
                   orderDetails: args?['orderDetails'] as Map<String, dynamic>?,
                 ),
               );

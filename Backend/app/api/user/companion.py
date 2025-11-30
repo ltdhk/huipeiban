@@ -112,7 +112,7 @@ def get_companions():
         }, '获取陪诊师列表成功')
 
     except Exception as e:
-        return error_response(f'获取陪诊师列表失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'获取陪诊师列表失败: {str(e)}')
 
 
 @bp.route('/<int:companion_id>', methods=['GET'])
@@ -145,7 +145,7 @@ def get_companion_detail(companion_id):
         ).first()
 
         if not companion:
-            return error_response('陪诊师不存在', 404)
+            return error_response(404, 'NOT_FOUND', '陪诊师不存在')
 
         # 转换为字典
         data = companion.to_dict()
@@ -189,7 +189,7 @@ def get_companion_detail(companion_id):
         return success_response(data, '获取陪诊师详情成功')
 
     except Exception as e:
-        return error_response(f'获取陪诊师详情失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'获取陪诊师详情失败: {str(e)}')
 
 
 @bp.route('/<int:companion_id>/reviews', methods=['GET'])
@@ -232,7 +232,7 @@ def get_companion_reviews(companion_id):
         ).first()
 
         if not companion:
-            return error_response('陪诊师不存在', 404)
+            return error_response(404, 'NOT_FOUND', '陪诊师不存在')
 
         # 获取查询参数
         page = request.args.get('page', 1, type=int)
@@ -283,4 +283,4 @@ def get_companion_reviews(companion_id):
         }, '获取评价列表成功')
 
     except Exception as e:
-        return error_response(f'获取评价列表失败: {str(e)}', 500)
+        return error_response(500, 'INTERNAL_ERROR', f'获取评价列表失败: {str(e)}')

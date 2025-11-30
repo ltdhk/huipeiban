@@ -3,18 +3,32 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'patient.freezed.dart';
 part 'patient.g.dart';
 
+// 自定义 JSON 转换函数
+int _intFromJson(dynamic value) {
+  if (value == null) return 0;
+  if (value is num) return value.toInt();
+  if (value is String) {
+    try {
+      return int.parse(value);
+    } catch (e) {
+      return 0;
+    }
+  }
+  return 0;
+}
+
 /// 就诊人模型
 @freezed
 class Patient with _$Patient {
   const factory Patient({
-    required int id,
-    @JsonKey(name: 'user_id') required int userId,
-    required String name,
-    required String gender,
+    @JsonKey(fromJson: _intFromJson) @Default(0) int id,
+    @JsonKey(name: 'user_id', fromJson: _intFromJson) @Default(0) int userId,
+    @Default('') String name,
+    @Default('') String gender,
     @JsonKey(name: 'birth_date') String? birthDate,
     String? phone,
     @JsonKey(name: 'id_card') String? idCard,
-    required String relationship,
+    @Default('') String relationship,
     @JsonKey(name: 'medical_history') String? medicalHistory,
     String? allergies,
     @JsonKey(name: 'special_needs') String? specialNeeds,

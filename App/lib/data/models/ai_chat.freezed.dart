@@ -186,6 +186,9 @@ mixin _$AiChatResponse {
   String? get intent => throw _privateConstructorUsedError;
   Map<String, dynamic>? get entities => throw _privateConstructorUsedError;
   List<Companion>? get recommendations => throw _privateConstructorUsedError;
+  @JsonKey(name: 'institution_recommendations')
+  List<Institution>? get institutionRecommendations =>
+      throw _privateConstructorUsedError;
   @JsonKey(name: 'collected_info')
   Map<String, dynamic>? get collectedInfo => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
@@ -209,6 +212,8 @@ abstract class $AiChatResponseCopyWith<$Res> {
       String? intent,
       Map<String, dynamic>? entities,
       List<Companion>? recommendations,
+      @JsonKey(name: 'institution_recommendations')
+      List<Institution>? institutionRecommendations,
       @JsonKey(name: 'collected_info') Map<String, dynamic>? collectedInfo,
       @JsonKey(name: 'created_at') DateTime? createdAt});
 }
@@ -231,6 +236,7 @@ class _$AiChatResponseCopyWithImpl<$Res, $Val extends AiChatResponse>
     Object? intent = freezed,
     Object? entities = freezed,
     Object? recommendations = freezed,
+    Object? institutionRecommendations = freezed,
     Object? collectedInfo = freezed,
     Object? createdAt = freezed,
   }) {
@@ -255,6 +261,10 @@ class _$AiChatResponseCopyWithImpl<$Res, $Val extends AiChatResponse>
           ? _value.recommendations
           : recommendations // ignore: cast_nullable_to_non_nullable
               as List<Companion>?,
+      institutionRecommendations: freezed == institutionRecommendations
+          ? _value.institutionRecommendations
+          : institutionRecommendations // ignore: cast_nullable_to_non_nullable
+              as List<Institution>?,
       collectedInfo: freezed == collectedInfo
           ? _value.collectedInfo
           : collectedInfo // ignore: cast_nullable_to_non_nullable
@@ -281,6 +291,8 @@ abstract class _$$AiChatResponseImplCopyWith<$Res>
       String? intent,
       Map<String, dynamic>? entities,
       List<Companion>? recommendations,
+      @JsonKey(name: 'institution_recommendations')
+      List<Institution>? institutionRecommendations,
       @JsonKey(name: 'collected_info') Map<String, dynamic>? collectedInfo,
       @JsonKey(name: 'created_at') DateTime? createdAt});
 }
@@ -301,6 +313,7 @@ class __$$AiChatResponseImplCopyWithImpl<$Res>
     Object? intent = freezed,
     Object? entities = freezed,
     Object? recommendations = freezed,
+    Object? institutionRecommendations = freezed,
     Object? collectedInfo = freezed,
     Object? createdAt = freezed,
   }) {
@@ -325,6 +338,10 @@ class __$$AiChatResponseImplCopyWithImpl<$Res>
           ? _value._recommendations
           : recommendations // ignore: cast_nullable_to_non_nullable
               as List<Companion>?,
+      institutionRecommendations: freezed == institutionRecommendations
+          ? _value._institutionRecommendations
+          : institutionRecommendations // ignore: cast_nullable_to_non_nullable
+              as List<Institution>?,
       collectedInfo: freezed == collectedInfo
           ? _value._collectedInfo
           : collectedInfo // ignore: cast_nullable_to_non_nullable
@@ -346,11 +363,14 @@ class _$AiChatResponseImpl implements _AiChatResponse {
       this.intent,
       final Map<String, dynamic>? entities,
       final List<Companion>? recommendations,
+      @JsonKey(name: 'institution_recommendations')
+      final List<Institution>? institutionRecommendations,
       @JsonKey(name: 'collected_info')
       final Map<String, dynamic>? collectedInfo,
       @JsonKey(name: 'created_at') this.createdAt})
       : _entities = entities,
         _recommendations = recommendations,
+        _institutionRecommendations = institutionRecommendations,
         _collectedInfo = collectedInfo;
 
   factory _$AiChatResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -383,6 +403,18 @@ class _$AiChatResponseImpl implements _AiChatResponse {
     return EqualUnmodifiableListView(value);
   }
 
+  final List<Institution>? _institutionRecommendations;
+  @override
+  @JsonKey(name: 'institution_recommendations')
+  List<Institution>? get institutionRecommendations {
+    final value = _institutionRecommendations;
+    if (value == null) return null;
+    if (_institutionRecommendations is EqualUnmodifiableListView)
+      return _institutionRecommendations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
   final Map<String, dynamic>? _collectedInfo;
   @override
   @JsonKey(name: 'collected_info')
@@ -400,7 +432,7 @@ class _$AiChatResponseImpl implements _AiChatResponse {
 
   @override
   String toString() {
-    return 'AiChatResponse(message: $message, sessionId: $sessionId, intent: $intent, entities: $entities, recommendations: $recommendations, collectedInfo: $collectedInfo, createdAt: $createdAt)';
+    return 'AiChatResponse(message: $message, sessionId: $sessionId, intent: $intent, entities: $entities, recommendations: $recommendations, institutionRecommendations: $institutionRecommendations, collectedInfo: $collectedInfo, createdAt: $createdAt)';
   }
 
   @override
@@ -415,6 +447,9 @@ class _$AiChatResponseImpl implements _AiChatResponse {
             const DeepCollectionEquality().equals(other._entities, _entities) &&
             const DeepCollectionEquality()
                 .equals(other._recommendations, _recommendations) &&
+            const DeepCollectionEquality().equals(
+                other._institutionRecommendations,
+                _institutionRecommendations) &&
             const DeepCollectionEquality()
                 .equals(other._collectedInfo, _collectedInfo) &&
             (identical(other.createdAt, createdAt) ||
@@ -430,6 +465,7 @@ class _$AiChatResponseImpl implements _AiChatResponse {
       intent,
       const DeepCollectionEquality().hash(_entities),
       const DeepCollectionEquality().hash(_recommendations),
+      const DeepCollectionEquality().hash(_institutionRecommendations),
       const DeepCollectionEquality().hash(_collectedInfo),
       createdAt);
 
@@ -455,6 +491,8 @@ abstract class _AiChatResponse implements AiChatResponse {
           final String? intent,
           final Map<String, dynamic>? entities,
           final List<Companion>? recommendations,
+          @JsonKey(name: 'institution_recommendations')
+          final List<Institution>? institutionRecommendations,
           @JsonKey(name: 'collected_info')
           final Map<String, dynamic>? collectedInfo,
           @JsonKey(name: 'created_at') final DateTime? createdAt}) =
@@ -474,6 +512,9 @@ abstract class _AiChatResponse implements AiChatResponse {
   Map<String, dynamic>? get entities;
   @override
   List<Companion>? get recommendations;
+  @override
+  @JsonKey(name: 'institution_recommendations')
+  List<Institution>? get institutionRecommendations;
   @override
   @JsonKey(name: 'collected_info')
   Map<String, dynamic>? get collectedInfo;
@@ -500,6 +541,9 @@ mixin _$AiChatMessage {
   DateTime get createdAt => throw _privateConstructorUsedError;
   List<Companion>? get recommendations =>
       throw _privateConstructorUsedError; // AI 推荐的陪诊师
+  @JsonKey(name: 'institution_recommendations')
+  List<Institution>? get institutionRecommendations =>
+      throw _privateConstructorUsedError; // AI 推荐的陪诊机构
   bool? get isLoading => throw _privateConstructorUsedError; // 是否正在加载
   @JsonKey(name: 'order_card')
   Map<String, dynamic>? get orderCard => throw _privateConstructorUsedError;
@@ -522,6 +566,8 @@ abstract class $AiChatMessageCopyWith<$Res> {
       String content,
       @JsonKey(name: 'created_at') DateTime createdAt,
       List<Companion>? recommendations,
+      @JsonKey(name: 'institution_recommendations')
+      List<Institution>? institutionRecommendations,
       bool? isLoading,
       @JsonKey(name: 'order_card') Map<String, dynamic>? orderCard});
 }
@@ -544,6 +590,7 @@ class _$AiChatMessageCopyWithImpl<$Res, $Val extends AiChatMessage>
     Object? content = null,
     Object? createdAt = null,
     Object? recommendations = freezed,
+    Object? institutionRecommendations = freezed,
     Object? isLoading = freezed,
     Object? orderCard = freezed,
   }) {
@@ -568,6 +615,10 @@ class _$AiChatMessageCopyWithImpl<$Res, $Val extends AiChatMessage>
           ? _value.recommendations
           : recommendations // ignore: cast_nullable_to_non_nullable
               as List<Companion>?,
+      institutionRecommendations: freezed == institutionRecommendations
+          ? _value.institutionRecommendations
+          : institutionRecommendations // ignore: cast_nullable_to_non_nullable
+              as List<Institution>?,
       isLoading: freezed == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -594,6 +645,8 @@ abstract class _$$AiChatMessageImplCopyWith<$Res>
       String content,
       @JsonKey(name: 'created_at') DateTime createdAt,
       List<Companion>? recommendations,
+      @JsonKey(name: 'institution_recommendations')
+      List<Institution>? institutionRecommendations,
       bool? isLoading,
       @JsonKey(name: 'order_card') Map<String, dynamic>? orderCard});
 }
@@ -614,6 +667,7 @@ class __$$AiChatMessageImplCopyWithImpl<$Res>
     Object? content = null,
     Object? createdAt = null,
     Object? recommendations = freezed,
+    Object? institutionRecommendations = freezed,
     Object? isLoading = freezed,
     Object? orderCard = freezed,
   }) {
@@ -638,6 +692,10 @@ class __$$AiChatMessageImplCopyWithImpl<$Res>
           ? _value._recommendations
           : recommendations // ignore: cast_nullable_to_non_nullable
               as List<Companion>?,
+      institutionRecommendations: freezed == institutionRecommendations
+          ? _value._institutionRecommendations
+          : institutionRecommendations // ignore: cast_nullable_to_non_nullable
+              as List<Institution>?,
       isLoading: freezed == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -659,9 +717,12 @@ class _$AiChatMessageImpl implements _AiChatMessage {
       required this.content,
       @JsonKey(name: 'created_at') required this.createdAt,
       final List<Companion>? recommendations,
+      @JsonKey(name: 'institution_recommendations')
+      final List<Institution>? institutionRecommendations,
       this.isLoading,
       @JsonKey(name: 'order_card') final Map<String, dynamic>? orderCard})
       : _recommendations = recommendations,
+        _institutionRecommendations = institutionRecommendations,
         _orderCard = orderCard;
 
   factory _$AiChatMessageImpl.fromJson(Map<String, dynamic> json) =>
@@ -688,6 +749,20 @@ class _$AiChatMessageImpl implements _AiChatMessage {
   }
 
 // AI 推荐的陪诊师
+  final List<Institution>? _institutionRecommendations;
+// AI 推荐的陪诊师
+  @override
+  @JsonKey(name: 'institution_recommendations')
+  List<Institution>? get institutionRecommendations {
+    final value = _institutionRecommendations;
+    if (value == null) return null;
+    if (_institutionRecommendations is EqualUnmodifiableListView)
+      return _institutionRecommendations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+// AI 推荐的陪诊机构
   @override
   final bool? isLoading;
 // 是否正在加载
@@ -705,7 +780,7 @@ class _$AiChatMessageImpl implements _AiChatMessage {
 
   @override
   String toString() {
-    return 'AiChatMessage(id: $id, role: $role, content: $content, createdAt: $createdAt, recommendations: $recommendations, isLoading: $isLoading, orderCard: $orderCard)';
+    return 'AiChatMessage(id: $id, role: $role, content: $content, createdAt: $createdAt, recommendations: $recommendations, institutionRecommendations: $institutionRecommendations, isLoading: $isLoading, orderCard: $orderCard)';
   }
 
   @override
@@ -720,6 +795,9 @@ class _$AiChatMessageImpl implements _AiChatMessage {
                 other.createdAt == createdAt) &&
             const DeepCollectionEquality()
                 .equals(other._recommendations, _recommendations) &&
+            const DeepCollectionEquality().equals(
+                other._institutionRecommendations,
+                _institutionRecommendations) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             const DeepCollectionEquality()
@@ -735,6 +813,7 @@ class _$AiChatMessageImpl implements _AiChatMessage {
       content,
       createdAt,
       const DeepCollectionEquality().hash(_recommendations),
+      const DeepCollectionEquality().hash(_institutionRecommendations),
       isLoading,
       const DeepCollectionEquality().hash(_orderCard));
 
@@ -759,6 +838,8 @@ abstract class _AiChatMessage implements AiChatMessage {
           required final String content,
           @JsonKey(name: 'created_at') required final DateTime createdAt,
           final List<Companion>? recommendations,
+          @JsonKey(name: 'institution_recommendations')
+          final List<Institution>? institutionRecommendations,
           final bool? isLoading,
           @JsonKey(name: 'order_card') final Map<String, dynamic>? orderCard}) =
       _$AiChatMessageImpl;
@@ -778,6 +859,9 @@ abstract class _AiChatMessage implements AiChatMessage {
   @override
   List<Companion>? get recommendations;
   @override // AI 推荐的陪诊师
+  @JsonKey(name: 'institution_recommendations')
+  List<Institution>? get institutionRecommendations;
+  @override // AI 推荐的陪诊机构
   bool? get isLoading;
   @override // 是否正在加载
   @JsonKey(name: 'order_card')

@@ -49,6 +49,9 @@ _$OrderImpl _$$OrderImplFromJson(Map<String, dynamic> json) => _$OrderImpl(
       companion: json['companion'] == null
           ? null
           : Companion.fromJson(json['companion'] as Map<String, dynamic>),
+      institution: json['institution'] == null
+          ? null
+          : Institution.fromJson(json['institution'] as Map<String, dynamic>),
       patient: json['patient'] == null
           ? null
           : Patient.fromJson(json['patient'] as Map<String, dynamic>),
@@ -88,6 +91,7 @@ Map<String, dynamic> _$$OrderImplToJson(_$OrderImpl instance) =>
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'companion': instance.companion,
+      'institution': instance.institution,
       'patient': instance.patient,
     };
 

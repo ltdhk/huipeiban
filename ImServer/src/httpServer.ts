@@ -9,8 +9,8 @@ import {
   fetchConversation,
   listConversations,
   loadHistory,
+  ensureParticipant,
 } from './chatService';
-import { ConversationRow } from './types';
 import { supabase } from './supabase';
 
 interface AuthedRequest extends express.Request {
@@ -42,6 +42,7 @@ export const createHttpServer = () => {
 
   app.get('/health', (_req, res) => res.send('ok'));
 
+  // 获取会话列表
   app.get('/api/v1/user/messages/conversations', async (req: AuthedRequest, res) => {
     try {
       const page = Number(req.query.page ?? 1);
@@ -53,21 +54,18 @@ export const createHttpServer = () => {
     }
   });
 
+  // 创建会话
   app.post('/api/v1/user/messages/conversations', async (req: AuthedRequest, res) => {
     const schema = z.object({
-      companion_id: z.number().optional(),
-      institution_id: z.number().optional(),
-      title: z.string().optional(),
+      target_user_id: z.number(),
     });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) {
-      return error(res, 400, 'BAD_REQUEST', '参数错误', parsed.error.flatten());
+      return error(res, 400, 'BAD_REQUEST', '参数错误：必须指定 target_user_id', parsed.error.flatten());
     }
     try {
       const conv = await createConversation(req.user!, {
-        companionId: parsed.data.companion_id,
-        institutionId: parsed.data.institution_id,
-        title: parsed.data.title,
+        targetUserId: parsed.data.target_user_id,
       });
       return success(res, conv, '创建成功');
     } catch (e: any) {
@@ -75,18 +73,23 @@ export const createHttpServer = () => {
     }
   });
 
+  // 获取会话消息
   app.get('/api/v1/user/messages/conversations/:id', async (req: AuthedRequest, res) => {
     try {
       const conversationId = Number(req.params.id);
+      console.log(`[HTTP] 获取会话 ${conversationId} 的消息，用户: ${req.user!.id}`);
       const conversation = await fetchConversation(conversationId);
-      ensureOwn(conversation, req.user!);
+      ensureParticipant(conversation, req.user!);
       const history = await loadHistory(conversationId, undefined, Math.min(Number(req.query.page_size ?? 50), 100));
+      console.log(`[HTTP] 返回 ${history.length} 条消息`);
       return success(res, { list: history, total: history.length, page: 1, page_size: history.length, total_pages: 1 }, '获取消息成功');
     } catch (e: any) {
+      console.error(`[HTTP] 获取消息失败:`, e);
       return error(res, 500, 'INTERNAL_ERROR', e.message ?? '获取消息失败');
     }
   });
 
+  // 发送消息
   app.post('/api/v1/user/messages/conversations/:id/messages', async (req: AuthedRequest, res) => {
     const schema = z.object({
       content: z.string().min(1),
@@ -97,7 +100,7 @@ export const createHttpServer = () => {
     try {
       const conversationId = Number(req.params.id);
       const conversation = await fetchConversation(conversationId);
-      ensureOwn(conversation, req.user!);
+      ensureParticipant(conversation, req.user!);
       const msg = await appendMessage(conversation, req.user!, parsed.data.content, parsed.data.content_type ?? 'text');
       return success(res, msg, '发送成功');
     } catch (e: any) {
@@ -105,10 +108,12 @@ export const createHttpServer = () => {
     }
   });
 
+  // 删除会话
   app.delete('/api/v1/user/messages/conversations/:id', async (req: AuthedRequest, res) => {
     try {
       const conversationId = Number(req.params.id);
-      ensureOwn(await fetchConversation(conversationId), req.user!);
+      const conversation = await fetchConversation(conversationId);
+      ensureParticipant(conversation, req.user!);
       await supabase.from('conversations').update({ status: 'archived' }).eq('id', conversationId);
       return success(res, null, '删除成功');
     } catch (e: any) {
@@ -116,6 +121,7 @@ export const createHttpServer = () => {
     }
   });
 
+  // 获取未读数
   app.get('/api/v1/user/messages/unread-count', async (req: AuthedRequest, res) => {
     try {
       const count = await countUnread(req.user!);
@@ -126,10 +132,4 @@ export const createHttpServer = () => {
   });
 
   return app;
-};
-
-const ensureOwn = (conversation: ConversationRow, user: AuthedUser) => {
-  if (user.role === 'user' && conversation.user_id !== user.id) throw new Error('无权访问');
-  if (user.role === 'companion' && conversation.companion_id !== user.id) throw new Error('无权访问');
-  if (user.role === 'institution' && conversation.institution_id !== user.id) throw new Error('无权访问');
 };

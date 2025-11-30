@@ -4,7 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../app/theme.dart';
 import '../../../data/models/order.dart';
 import '../../../data/repositories/order_repository.dart';
+import '../../../data/repositories/message_repository.dart';
 import 'order_detail_page.dart';
+import '../messages/chat_detail_page.dart';
 
 /// 订单页面
 class OrdersPage extends ConsumerStatefulWidget {
@@ -27,7 +29,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
   // 订单状态标签
   final List<Map<String, String>> _tabs = [
     {'label': '全部', 'status': ''},
-    {'label': '待支付', 'status': 'pending_payment'},
+    {'label': '已预约', 'status': 'pending_payment'},
     {'label': '待服务', 'status': 'pending_accept,accepted'},
     {'label': '服务中', 'status': 'in_progress'},
     {'label': '已完成', 'status': 'completed'},
@@ -60,16 +62,17 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
-          labelColor: AppTheme.primaryColor,  // 选中文字颜色：蓝色
-          unselectedLabelColor: AppTheme.textSecondary,  // 未选中文字颜色：灰色
-          indicatorColor: AppTheme.primaryColor,  // 指示器颜色
+          labelColor: Colors.white,  // 选中文字颜色：白色
+          unselectedLabelColor: Colors.white70,  // 未选中文字颜色：半透明白色
+          indicatorColor: Colors.white,  // 指示器颜色：白色
           indicatorWeight: 3.0,
+          indicatorSize: TabBarIndicatorSize.label,
           labelStyle: TextStyle(
             fontSize: 15.sp,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
           ),
           unselectedLabelStyle: TextStyle(
-            fontSize: 15.sp,
+            fontSize: 14.sp,
             fontWeight: FontWeight.normal,
           ),
           tabs: _tabs.map((tab) => Tab(text: tab['label'])).toList(),
@@ -108,6 +111,8 @@ class _OrderListViewState extends State<_OrderListView>
   bool _isLoading = true;
   bool _hasError = false;
   String _errorMessage = '';
+  final MessageRepository _messageRepository = MessageRepository();
+  bool _isCreatingConversation = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -407,21 +412,68 @@ class _OrderListViewState extends State<_OrderListView>
     );
   }
 
+  /// 联系服务提供方（陪诊师或机构）
+  Future<void> _contactServiceProvider(Order order) async {
+    if (_isCreatingConversation) return;
+
+    setState(() => _isCreatingConversation = true);
+
+    try {
+      // 获取服务提供方的用户ID
+      // 注意：需要使用 companion.userId，而不是 order.companionId
+      // companion.userId 是关联到 users 表的 ID，用于即时通讯
+      // order.companionId 是 companions 表的主键 ID
+      int? targetUserId;
+      if (order.orderType == 'companion') {
+        targetUserId = order.companion?.userId;
+      } else {
+        // 机构使用 institution.userId 进行即时通讯
+        targetUserId = order.institution?.userId;
+      }
+
+      if (targetUserId == null) {
+        throw Exception('无法获取服务提供方信息');
+      }
+
+      // 调用API创建或获取已存在的会话
+      final conversation = await _messageRepository.createConversation(
+        targetUserId: targetUserId,
+      );
+
+      if (!mounted) return;
+
+      // 跳转到聊天详情页
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChatDetailPage(conversation: conversation),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('创建会话失败: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isCreatingConversation = false);
+      }
+    }
+  }
+
   /// 构建操作按钮
   Widget _buildActionButton(Order order) {
     switch (order.status) {
       case 'pending_payment':
         return ElevatedButton(
-          onPressed: () {
-            // TODO: 跳转到支付页面
-          },
+          onPressed: () => _contactServiceProvider(order),
           style: ElevatedButton.styleFrom(
             minimumSize: Size(80.w, 32.h),
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             backgroundColor: AppTheme.primaryColor,
           ),
           child: Text(
-            '去支付',
+            '去联系',
             style: TextStyle(fontSize: 13.sp, color: Colors.white),
           ),
         );
@@ -497,7 +549,7 @@ class _OrderListViewState extends State<_OrderListView>
   Map<String, dynamic> _getStatusConfig(String status) {
     switch (status) {
       case 'pending_payment':
-        return {'text': '待支付', 'color': AppTheme.warningColor};
+        return {'text': '预约成功', 'color': AppTheme.successColor};
       case 'pending_accept':
         return {'text': '待接单', 'color': AppTheme.infoColor};
       case 'accepted':

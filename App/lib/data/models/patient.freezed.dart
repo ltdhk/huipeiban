@@ -20,8 +20,9 @@ Patient _$PatientFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Patient {
+  @JsonKey(fromJson: _intFromJson)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _intFromJson)
   int get userId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get gender => throw _privateConstructorUsedError;
@@ -58,8 +59,8 @@ abstract class $PatientCopyWith<$Res> {
       _$PatientCopyWithImpl<$Res, Patient>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') int userId,
+      {@JsonKey(fromJson: _intFromJson) int id,
+      @JsonKey(name: 'user_id', fromJson: _intFromJson) int userId,
       String name,
       String gender,
       @JsonKey(name: 'birth_date') String? birthDate,
@@ -183,8 +184,8 @@ abstract class _$$PatientImplCopyWith<$Res> implements $PatientCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') int userId,
+      {@JsonKey(fromJson: _intFromJson) int id,
+      @JsonKey(name: 'user_id', fromJson: _intFromJson) int userId,
       String name,
       String gender,
       @JsonKey(name: 'birth_date') String? birthDate,
@@ -302,14 +303,14 @@ class __$$PatientImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PatientImpl implements _Patient {
   const _$PatientImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') required this.userId,
-      required this.name,
-      required this.gender,
+      {@JsonKey(fromJson: _intFromJson) this.id = 0,
+      @JsonKey(name: 'user_id', fromJson: _intFromJson) this.userId = 0,
+      this.name = '',
+      this.gender = '',
       @JsonKey(name: 'birth_date') this.birthDate,
       this.phone,
       @JsonKey(name: 'id_card') this.idCard,
-      required this.relationship,
+      this.relationship = '',
       @JsonKey(name: 'medical_history') this.medicalHistory,
       this.allergies,
       @JsonKey(name: 'special_needs') this.specialNeeds,
@@ -323,13 +324,16 @@ class _$PatientImpl implements _Patient {
       _$$PatientImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _intFromJson)
   final int id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _intFromJson)
   final int userId;
   @override
+  @JsonKey()
   final String name;
   @override
+  @JsonKey()
   final String gender;
   @override
   @JsonKey(name: 'birth_date')
@@ -340,6 +344,7 @@ class _$PatientImpl implements _Patient {
   @JsonKey(name: 'id_card')
   final String? idCard;
   @override
+  @JsonKey()
   final String relationship;
   @override
   @JsonKey(name: 'medical_history')
@@ -440,14 +445,14 @@ class _$PatientImpl implements _Patient {
 
 abstract class _Patient implements Patient {
   const factory _Patient(
-      {required final int id,
-      @JsonKey(name: 'user_id') required final int userId,
-      required final String name,
-      required final String gender,
+      {@JsonKey(fromJson: _intFromJson) final int id,
+      @JsonKey(name: 'user_id', fromJson: _intFromJson) final int userId,
+      final String name,
+      final String gender,
       @JsonKey(name: 'birth_date') final String? birthDate,
       final String? phone,
       @JsonKey(name: 'id_card') final String? idCard,
-      required final String relationship,
+      final String relationship,
       @JsonKey(name: 'medical_history') final String? medicalHistory,
       final String? allergies,
       @JsonKey(name: 'special_needs') final String? specialNeeds,
@@ -460,9 +465,10 @@ abstract class _Patient implements Patient {
   factory _Patient.fromJson(Map<String, dynamic> json) = _$PatientImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _intFromJson)
   int get id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _intFromJson)
   int get userId;
   @override
   String get name;

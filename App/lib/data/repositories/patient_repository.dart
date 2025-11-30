@@ -45,41 +45,9 @@ class PatientRepository {
     }
   }
 
-  /// 创建就诊人
-  Future<Patient> createPatient({
-    required String name,
-    required String gender,
-    DateTime? birthDate,
-    String? phone,
-    String? idCard,
-    required String relationship,
-    String? medicalHistory,
-    String? allergies,
-    String? specialNeeds,
-    String? insuranceType,
-    String? insuranceNumber,
-    bool isDefault = false,
-  }) async {
+  /// 创建就诊人（Map 参数版本）
+  Future<Patient> createPatient(Map<String, dynamic> data) async {
     try {
-      final data = {
-        'name': name,
-        'gender': gender,
-        'relationship': relationship,
-        'is_default': isDefault,
-      };
-
-      // 添加可选字段
-      if (birthDate != null) {
-        data['birth_date'] = birthDate.toIso8601String().split('T')[0];
-      }
-      if (phone != null) data['phone'] = phone;
-      if (idCard != null) data['id_card'] = idCard;
-      if (medicalHistory != null) data['medical_history'] = medicalHistory;
-      if (allergies != null) data['allergies'] = allergies;
-      if (specialNeeds != null) data['special_needs'] = specialNeeds;
-      if (insuranceType != null) data['insurance_type'] = insuranceType;
-      if (insuranceNumber != null) data['insurance_number'] = insuranceNumber;
-
       final response = await _apiProvider.createPatient(data);
 
       if (response.success && response.data != null) {

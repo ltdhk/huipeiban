@@ -181,7 +181,7 @@ class AppTheme {
   static Color getStatusColor(String status) {
     switch (status) {
       case AppConstants.orderStatusPendingPayment:
-        return warningColor;
+        return successColor;
       case AppConstants.orderStatusPendingAccept:
       case AppConstants.orderStatusPendingService:
         return infoColor;
@@ -200,7 +200,7 @@ class AppTheme {
   static String getStatusText(String status) {
     switch (status) {
       case AppConstants.orderStatusPendingPayment:
-        return '待支付';
+        return '预约成功';
       case AppConstants.orderStatusPendingAccept:
         return '待接单';
       case AppConstants.orderStatusPendingService:

@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'companion.dart';
+import 'institution.dart';
 
 part 'ai_chat.freezed.dart';
 part 'ai_chat.g.dart';
@@ -25,6 +26,7 @@ class AiChatResponse with _$AiChatResponse {
     String? intent,
     Map<String, dynamic>? entities,
     List<Companion>? recommendations,
+    @JsonKey(name: 'institution_recommendations') List<Institution>? institutionRecommendations,
     @JsonKey(name: 'collected_info') Map<String, dynamic>? collectedInfo,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _AiChatResponse;
@@ -42,6 +44,7 @@ class AiChatMessage with _$AiChatMessage {
     required String content,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     List<Companion>? recommendations, // AI 推荐的陪诊师
+    @JsonKey(name: 'institution_recommendations') List<Institution>? institutionRecommendations, // AI 推荐的陪诊机构
     bool? isLoading, // 是否正在加载
     @JsonKey(name: 'order_card') Map<String, dynamic>? orderCard, // 订单卡片数据
   }) = _AiChatMessage;

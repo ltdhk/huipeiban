@@ -73,17 +73,18 @@ class ChatListNotifier extends StateNotifier<AsyncValue<List<Conversation>>> {
         updatedAt: msg.createdAt ?? DateTime.now(),
       );
     } else {
-      // 新会话
+      // 新会话 - 简化设计，只记录双方用户ID
+      final otherUserId = msg.senderId == userId ? msg.receiverId : msg.senderId;
       updatedList.insert(
         0,
         Conversation(
           id: msg.conversationId,
-          userId: msg.senderId,
-          companionId: null,
-          institutionId: null,
-          title: '会话',
+          user1Id: userId ?? msg.senderId,
+          user2Id: otherUserId,
           lastMessage: msg.content,
+          lastMessageAt: msg.createdAt ?? DateTime.now(),
           unreadCount: userId != null && msg.receiverId == userId ? 1 : 0,
+          otherUserId: otherUserId,
           status: 'active',
           createdAt: msg.createdAt ?? DateTime.now(),
           updatedAt: msg.createdAt ?? DateTime.now(),
@@ -191,9 +192,7 @@ class ChatMessagesNotifier extends StateNotifier<AsyncValue<List<Message>>> {
       id: placeholderId,
       conversationId: conversationId,
       senderId: userId,
-      senderType: 'user',
-      receiverId: 0,
-      receiverType: 'user',
+      receiverId: 0,  // 实际接收者ID由服务器确定
       contentType: contentType,
       content: content,
       isRead: true,

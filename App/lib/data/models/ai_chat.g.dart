@@ -27,6 +27,10 @@ _$AiChatResponseImpl _$$AiChatResponseImplFromJson(Map<String, dynamic> json) =>
       recommendations: (json['recommendations'] as List<dynamic>?)
           ?.map((e) => Companion.fromJson(e as Map<String, dynamic>))
           .toList(),
+      institutionRecommendations:
+          (json['institution_recommendations'] as List<dynamic>?)
+              ?.map((e) => Institution.fromJson(e as Map<String, dynamic>))
+              .toList(),
       collectedInfo: json['collected_info'] as Map<String, dynamic>?,
       createdAt: json['created_at'] == null
           ? null
@@ -41,6 +45,7 @@ Map<String, dynamic> _$$AiChatResponseImplToJson(
       'intent': instance.intent,
       'entities': instance.entities,
       'recommendations': instance.recommendations,
+      'institution_recommendations': instance.institutionRecommendations,
       'collected_info': instance.collectedInfo,
       'created_at': instance.createdAt?.toIso8601String(),
     };
@@ -54,6 +59,10 @@ _$AiChatMessageImpl _$$AiChatMessageImplFromJson(Map<String, dynamic> json) =>
       recommendations: (json['recommendations'] as List<dynamic>?)
           ?.map((e) => Companion.fromJson(e as Map<String, dynamic>))
           .toList(),
+      institutionRecommendations:
+          (json['institution_recommendations'] as List<dynamic>?)
+              ?.map((e) => Institution.fromJson(e as Map<String, dynamic>))
+              .toList(),
       isLoading: json['isLoading'] as bool?,
       orderCard: json['order_card'] as Map<String, dynamic>?,
     );
@@ -65,6 +74,7 @@ Map<String, dynamic> _$$AiChatMessageImplToJson(_$AiChatMessageImpl instance) =>
       'content': instance.content,
       'created_at': instance.createdAt.toIso8601String(),
       'recommendations': instance.recommendations,
+      'institution_recommendations': instance.institutionRecommendations,
       'isLoading': instance.isLoading,
       'order_card': instance.orderCard,
     };

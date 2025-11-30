@@ -42,7 +42,15 @@
       "Bash(powershell -Command:*)",
       "Bash(powershell:*)",
       "Bash(timeout 120 python:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git fetch:*)",
+      "Bash(timeout 60 flutter build:*)",
+      "Bash(flutter pub cache:*)",
+      "Bash(flutter pub:*)",
+      "Bash(dir:*)",
+      "Bash(timeout 120 flutter build:*)",
+      "Bash(git commit:*)",
+      "Bash(tasklist:*)"
     ],
     "deny": [],
     "ask": []
